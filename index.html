@@ -1197,6 +1197,21 @@
                         }
                     });
 
+                    // Sort berdasarkan kolom "No"
+                    const noColIndex = referenceColumns.findIndex(
+                        col => col.toLowerCase() === 'no'
+                    );
+                    if (noColIndex !== -1) {
+                        const header = mergedData[0];
+                        const dataRows = mergedData.slice(1);
+                        dataRows.sort((a, b) => {
+                            const valA = parseFloat(a[noColIndex]) || 0;
+                            const valB = parseFloat(b[noColIndex]) || 0;
+                            return valA - valB;
+                        });
+                        mergedData = [header, ...dataRows];
+                    }
+
                     mergedReady = true;
                     renderPreview();
                     previewSection.style.display = 'block';
