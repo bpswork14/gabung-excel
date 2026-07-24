@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Merger — Penggabung File Excel</title>
+    <meta name="description"
+        content="Aplikasi web untuk menggabungkan beberapa file Excel menjadi satu berdasarkan kolom file pertama.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2236;
+            --bg-card-hover: #1f2a42;
+            --bg-input: #0d1322;
+            --border: #2a3550;
+            --border-active: #4f7cff;
+            --text-primary: #e8ecf4;
+            --text-secondary: #8b95aa;
+            --text-muted: #5a6478;
+            --accent: #4f7cff;
+            --accent-hover: #6b91ff;
+            --accent-glow: rgba(79, 124, 255, 0.25);
+            --success: #34d399;
+            --success-bg: rgba(52, 211, 153, 0.1);
+            --warning: #fbbf24;
+            --warning-bg: rgba(251, 191, 36, 0.1);
+            --danger: #f87171;
+            --danger-bg: rgba(248, 113, 113, 0.1);
+            --gradient-1: linear-gradient(135deg, #4f7cff 0%, #a855f7 100%);
+            --gradient-2: linear-gradient(135deg, #0a0e1a 0%, #1a2236 100%);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background decoration */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 20% 20%, rgba(79, 124, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Steps indicator */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: rgba(79, 124, 255, 0.08);
+        }
+
+        .step.done {
+            color: var(--success);
+            border-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .step-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-num {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .step.done .step-num {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .step-connector {
+            width: 32px;
+            height: 2px;
+            background: var(--border);
+            border-radius: 1px;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(79, 124, 255, 0.04);
+        }
+
+        .drop-zone.drag-over::before {
+            opacity: 0.05;
+        }
+
+        .drop-zone-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .drop-zone-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .drop-zone h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .drop-zone p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .drop-zone .browse-link {
+            color: var(--accent);
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .drop-zone .file-types {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .file-type-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            letter-spacing: 0.5px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* File list */
+        .file-list-section {
+            margin-top: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-count {
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--accent);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-item:first-child {
+            border-color: var(--accent);
+            background: rgba(79, 124, 255, 0.04);
+        }
+
+        .file-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-xs);
+            background: var(--success-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-item-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--success);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .file-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-item-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            margin-top: 2px;
+        }
+
+        .file-item:first-child .file-item-badge {
+            display: inline-block;
+        }
+
+        .file-item-badge {
+            display: none;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(79, 124, 255, 0.12);
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .file-item-remove {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-xs);
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .file-item-remove:hover {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        /* Column preview */
+        .columns-section {
+            margin-top: 32px;
+        }
+
+        .columns-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .column-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .column-tag .col-index {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Action buttons */
+        .actions {
+            margin-top: 32px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #34d399);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.25);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(52, 211, 153, 0.3);
+        }
+
+        /* Preview table */
+        .preview-section {
+            margin-top: 32px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: var(--bg-input);
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        th {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            text-align: left;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(42, 53, 80, 0.5);
+            white-space: nowrap;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background: rgba(79, 124, 255, 0.03);
+        }
+
+        .source-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .preview-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: var(--bg-input);
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Status / toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 999;
+            animation: toastIn 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast-success {
+            background: #065f46;
+            color: #d1fae5;
+            border: 1px solid #059669;
+        }
+
+        .toast-error {
+            background: #7f1d1d;
+            color: #fecaca;
+            border: 1px solid #b91c1c;
+        }
+
+        .toast-info {
+            background: #1e3a5f;
+            color: #bfdbfe;
+            border: 1px solid #2563eb;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+            fill: none;
+            stroke-width: 1.5;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 24px 16px 60px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .steps {
+                flex-wrap: wrap;
+            }
+
+            .drop-zone {
+                padding: 40px 24px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-badge">
+                <span class="dot"></span>
+                Excel Merger Tool
+            </div>
+            <h1>Penggabung File Excel</h1>
+            <p>Unggah beberapa file Excel, kolom otomatis mengikuti file pertama. Gabungkan dan unduh hasilnya.</p>
+        </header>
+
+        <!-- Steps -->
+        <div class="steps" id="stepsIndicator">
+            <div class="step active" id="step1">
+                <span class="step-num">1</span>
+                Unggah File
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" id="step2">
+                <span class="step-num">2</span>
+                Gabungkan
+            </div>
+            <div class="step-connector"></div>
+            <div class="step" id="step3">
+                <span class="step-num">3</span>
+                Unduh Hasil
+            </div>
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-zone-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+            </div>
+            <h3>Seret & lepas file Excel di sini</h3>
+            <p>atau <span class="browse-link">pilih file dari komputer</span></p>
+            <div class="file-types">
+                <span class="file-type-badge">.XLSX</span>
+                <span class="file-type-badge">.XLS</span>
+                <span class="file-type-badge">.CSV</span>
+            </div>
+            <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv">
+        </div>
+
+        <!-- File List -->
+        <div class="file-list-section" id="fileListSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    File Terunggah
+                    <span class="file-count" id="fileCount">0</span>
+                </div>
+                <button class="btn btn-danger" onclick="clearAllFiles()" style="padding:8px 16px; font-size:12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                    </svg>
+                    Hapus Semua
+                </button>
+            </div>
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <!-- Columns Preview -->
+        <div class="columns-section" id="columnsSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                    Kolom Referensi (dari file pertama)
+                </div>
+            </div>
+            <div class="columns-grid" id="columnsGrid"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions" id="actionsSection" style="display:none;">
+            <button class="btn btn-primary" id="mergeBtn" onclick="mergeFiles()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                </svg>
+                Gabungkan Semua File
+            </button>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-section" id="previewSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Pratinjau Hasil Gabungan
+                </div>
+            </div>
+            <div class="table-wrapper" id="tableWrapper"></div>
+            <div class="actions" style="margin-top:20px;">
+                <button class="btn btn-success" onclick="downloadResult()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Unduh Hasil (.xlsx)
+                </button>
+                <button class="btn btn-secondary" onclick="downloadCSV()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Unduh Hasil (.csv)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── State ───────────────────────────────────────────────────
+        let uploadedFiles = [];       // { name, size, data: [[...], ...], sheetName }
+        let referenceColumns = [];    // string[]
+        let mergedData = [];          // [[...], ...]
+        let mergedReady = false;
+
+        // ─── DOM refs ────────────────────────────────────────────────
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileListSection = document.getElementById('fileListSection');
+        const fileList = document.getElementById('fileList');
+        const fileCount = document.getElementById('fileCount');
+        const columnsSection = document.getElementById('columnsSection');
+        const columnsGrid = document.getElementById('columnsGrid');
+        const actionsSection = document.getElementById('actionsSection');
+        const previewSection = document.getElementById('previewSection');
+        const tableWrapper = document.getElementById('tableWrapper');
+        const mergeBtn = document.getElementById('mergeBtn');
+
+        // ─── Events ─────────────────────────────────────────────────
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', e => {
+            handleFiles(e.target.files);
+            fileInput.value = '';
+        });
+
+        // ─── File handling ───────────────────────────────────────────
+        function handleFiles(filesList) {
+            const validTypes = [
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'text/csv',
+                'application/csv',
+            ];
+            const validExt = ['.xlsx', '.xls', '.csv'];
+
+            for (const file of filesList) {
+                const ext = '.' + file.name.split('.').pop().toLowerCase();
+                if (!validExt.includes(ext)) {
+                    showToast(`"${file.name}" bukan file Excel/CSV yang valid.`, 'error');
+                    continue;
+                }
+                readFile(file);
+            }
+        }
+
+        function readFile(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const wb = XLSX.read(data, { type: 'array', cellDates: true });
+                    const sheetName = wb.SheetNames[0];
+                    const ws = wb.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+                    if (jsonData.length === 0) {
+                        showToast(`"${file.name}" kosong, dilewati.`, 'error');
+                        return;
+                    }
+
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: file.size,
+                        sheetName,
+                        data: jsonData,
+                        rows: jsonData.length - 1, // minus header
+                    });
+
+                    // If first file, set reference columns
+                    if (uploadedFiles.length === 1) {
+                        referenceColumns = jsonData[0].map(c => String(c).trim());
+                    }
+
+                    updateUI();
+                    showToast(`"${file.name}" berhasil dimuat (${jsonData.length - 1} baris)`, 'success');
+                } catch (err) {
+                    showToast(`Gagal membaca "${file.name}": ${err.message}`, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // ─── UI updates ─────────────────────────────────────────────
+        function updateUI() {
+            const hasFiles = uploadedFiles.length > 0;
+
+            fileListSection.style.display = hasFiles ? 'block' : 'none';
+            columnsSection.style.display = hasFiles ? 'block' : 'none';
+            actionsSection.style.display = uploadedFiles.length >= 1 ? 'flex' : 'none';
+
+            fileCount.textContent = uploadedFiles.length;
+
+            // Steps
+            document.getElementById('step1').className = hasFiles ? 'step done' : 'step active';
+            document.getElementById('step2').className = hasFiles ? (mergedReady ? 'step done' : 'step active') : 'step';
+            document.getElementById('step3').className = mergedReady ? 'step active' : 'step';
+
+            renderFileList();
+            renderColumns();
+        }
+
+        function renderFileList() {
+            fileList.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="file-item">
+                    <div class="file-item-icon">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="file-item-info">
+                        <div class="file-item-name">${escapeHtml(f.name)}</div>
+                        <div class="file-item-meta">
+                            <span>${formatSize(f.size)}</span>
+                            <span>${f.rows} baris</span>
+                            <span>${f.data[0].length} kolom</span>
+                            <span class="file-item-badge">REFERENSI KOLOM</span>
+                        </div>
+                    </div>
+                    <button class="file-item-remove" onclick="removeFile(${i})" title="Hapus file">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderColumns() {
+            if (referenceColumns.length === 0) {
+                columnsGrid.innerHTML = '<span style="color:var(--text-muted);font-size:13px;">Belum ada kolom.</span>';
+                return;
+            }
+            columnsGrid.innerHTML = referenceColumns.map((col, i) => `
+                <div class="column-tag">
+                    <span class="col-index">${i + 1}</span>
+                    ${escapeHtml(col || '(kosong)')}
+                </div>
+            `).join('');
+        }
+
+        // ─── File management ────────────────────────────────────────
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            if (index === 0 && uploadedFiles.length > 0) {
+                // Recalculate reference columns from new first file
+                referenceColumns = uploadedFiles[0].data[0].map(c => String(c).trim());
+            } else if (uploadedFiles.length === 0) {
+                referenceColumns = [];
+            }
+            mergedReady = false;
+            mergedData = [];
+            previewSection.style.display = 'none';
+            updateUI();
+        }
+
+        function clearAllFiles() {
+            uploadedFiles = [];
+            referenceColumns = [];
+            mergedData = [];
+            mergedReady = false;
+            previewSection.style.display = 'none';
+            updateUI();
+        }
+
+        // ─── Merge logic ────────────────────────────────────────────
+        function mergeFiles() {
+            if (uploadedFiles.length === 0) {
+                showToast('Tidak ada file untuk digabungkan.', 'error');
+                return;
+            }
+
+            mergeBtn.disabled = true;
+            mergeBtn.innerHTML = '<span class="spinner"></span> Menggabungkan...';
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    mergedData = [referenceColumns.slice()]; // header row
+
+                    uploadedFiles.forEach((file, fileIndex) => {
+                        const fileHeader = file.data[0].map(c => String(c).trim());
+
+                        // Build column mapping: refCol index -> file col index
+                        const colMap = referenceColumns.map(refCol => {
+                            const idx = fileHeader.indexOf(refCol);
+                            return idx;
+                        });
+
+                        // Add data rows (skip header)
+                        for (let r = 1; r < file.data.length; r++) {
+                            const row = file.data[r];
+                            // Skip completely empty rows
+                            if (row.every(cell => cell === '' || cell === null || cell === undefined)) continue;
+
+                            const newRow = colMap.map(colIdx => {
+                                if (colIdx === -1) return '';
+                                const val = row[colIdx];
+                                return val !== undefined && val !== null ? val : '';
+                            });
+                            mergedData.push(newRow);
+                        }
+                    });
+
+                    mergedReady = true;
+                    renderPreview();
+                    previewSection.style.display = 'block';
+                    updateUI();
+
+                    const totalRows = mergedData.length - 1;
+                    showToast(`Berhasil digabungkan! Total: ${totalRows} baris data.`, 'success');
+
+                    // Scroll to preview
+                    previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (err) {
+                    showToast('Gagal menggabungkan: ' + err.message, 'error');
+                } finally {
+                    mergeBtn.disabled = false;
+                    mergeBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                        Gabungkan Semua File
+                    `;
+                }
+            }, 100);
+        }
+
+        // ─── Preview ─────────────────────────────────────────────────
+        function renderPreview() {
+            if (mergedData.length === 0) return;
+
+            const maxPreview = 100;
+            const headers = mergedData[0];
+            const dataRows = mergedData.slice(1, maxPreview + 1);
+            const totalRows = mergedData.length - 1;
+
+            let html = '<table><thead><tr>';
+            html += '<th>#</th>';
+            headers.forEach(h => {
+                html += `<th>${escapeHtml(String(h))}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            dataRows.forEach((row, i) => {
+                html += '<tr>';
+                html += `<td style="color:var(--text-muted);font-size:11px;">${i + 1}</td>`;
+                row.forEach(cell => {
+                    const val = cell instanceof Date
+                        ? cell.toLocaleDateString('id-ID')
+                        : String(cell);
+                    html += `<td title="${escapeHtml(val)}">${escapeHtml(val)}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            html += `<div class="preview-info">
+                <span>Menampilkan ${Math.min(maxPreview, totalRows)} dari ${totalRows} baris</span>
+                <span>${headers.length} kolom</span>
+            </div>`;
+
+            tableWrapper.innerHTML = html;
+        }
+
+        // ─── Download ────────────────────────────────────────────────
+        function downloadResult() {
+            if (!mergedReady || mergedData.length === 0) return;
+
+            const ws = XLSX.utils.aoa_to_sheet(mergedData);
+
+            // Auto-fit column widths
+            const colWidths = mergedData[0].map((_, colIdx) => {
+                let maxLen = 10;
+                mergedData.forEach(row => {
+                    const val = String(row[colIdx] || '');
+                    if (val.length > maxLen) maxLen = val.length;
+                });
+                return { wch: Math.min(maxLen + 2, 40) };
+            });
+            ws['!cols'] = colWidths;
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Gabungan');
+            XLSX.writeFile(wb, `hasil_gabungan_${getTimestamp()}.xlsx`);
+
+            showToast('File XLSX berhasil diunduh!', 'success');
+
+            document.getElementById('step3').className = 'step done';
+        }
+
+        function downloadCSV() {
+            if (!mergedReady || mergedData.length === 0) return;
+
+            const ws = XLSX.utils.aoa_to_sheet(mergedData);
+            const csv = XLSX.utils.sheet_to_csv(ws);
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `hasil_gabungan_${getTimestamp()}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('File CSV berhasil diunduh!', 'success');
+
+            document.getElementById('step3').className = 'step done';
+        }
+
+        // ─── Helpers ─────────────────────────────────────────────────
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function getTimestamp() {
+            const d = new Date();
+            return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}_${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function showToast(msg, type = 'info') {
+            const existing = document.querySelectorAll('.toast');
+            existing.forEach(t => t.remove());
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = {
+                success: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                error: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+            };
+
+            toast.innerHTML = `${icons[type] || icons.info} ${escapeHtml(msg)}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s, transform 0.3s';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+
+</html>
