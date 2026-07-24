@@ -206,6 +206,37 @@
             border-radius: 1px;
         }
 
+        /* Drop zone disabled state */
+        .drop-zone.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: var(--border);
+            background: var(--bg-card);
+        }
+
+        .drop-zone.disabled:hover,
+        .drop-zone.disabled.drag-over {
+            border-color: var(--border);
+            background: var(--bg-card);
+        }
+
+        /* Re-upload button */
+        .btn-reupload {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+        }
+
+        .btn-reupload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.35);
+        }
+
+        .btn-reupload:active {
+            transform: translateY(0);
+        }
+
         /* Drop zone */
         .drop-zone {
             border: 2px dashed var(--border);
@@ -887,6 +918,13 @@
                     </svg>
                     Unduh Hasil (.csv)
                 </button>
+                <button class="btn btn-reupload" onclick="reUpload()">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                    </svg>
+                    Upload Ulang
+                </button>
             </div>
         </div>
     </div>
@@ -912,7 +950,13 @@
         const mergeBtn = document.getElementById('mergeBtn');
 
         // ─── Events ─────────────────────────────────────────────────
-        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('click', () => {
+            if (mergedReady) {
+                showToast('Penggabungan sudah dilakukan. Tekan "Upload Ulang" untuk mengunggah file baru.', 'info');
+                return;
+            }
+            fileInput.click();
+        });
 
         dropZone.addEventListener('dragover', e => {
             e.preventDefault();
@@ -936,6 +980,12 @@
 
         // ─── File handling ───────────────────────────────────────────
         function handleFiles(filesList) {
+            // Block upload if merge has already been done
+            if (mergedReady) {
+                showToast('Penggabungan sudah dilakukan. Tekan "Upload Ulang" untuk mengunggah file baru.', 'info');
+                return;
+            }
+
             const validTypes = [
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'application/vnd.ms-excel',
@@ -1066,7 +1116,31 @@
             mergedData = [];
             mergedReady = false;
             previewSection.style.display = 'none';
+            unlockUpload();
             updateUI();
+        }
+
+        // ─── Lock/Unlock upload after merge ──────────────────────────
+        function lockUpload() {
+            dropZone.classList.add('disabled');
+            fileInput.disabled = true;
+        }
+
+        function unlockUpload() {
+            dropZone.classList.remove('disabled');
+            fileInput.disabled = false;
+        }
+
+        function reUpload() {
+            uploadedFiles = [];
+            referenceColumns = [];
+            mergedData = [];
+            mergedReady = false;
+            previewSection.style.display = 'none';
+            unlockUpload();
+            updateUI();
+            showToast('Siap untuk mengunggah file baru.', 'info');
+            dropZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // ─── Merge logic ────────────────────────────────────────────
@@ -1111,6 +1185,7 @@
                     mergedReady = true;
                     renderPreview();
                     previewSection.style.display = 'block';
+                    lockUpload();
                     updateUI();
 
                     const totalRows = mergedData.length - 1;
