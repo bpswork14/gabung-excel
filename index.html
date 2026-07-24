@@ -1158,6 +1158,9 @@
             setTimeout(() => {
                 try {
                     mergedData = [referenceColumns.slice()]; // header row
+                    const lastColIndex = referenceColumns.length - 1; // index kolom terakhir (URL)
+                    const seenKeys = new Set();
+                    let duplicateCount = 0;
 
                     uploadedFiles.forEach((file, fileIndex) => {
                         const fileHeader = file.data[0].map(c => String(c).trim());
@@ -1179,6 +1182,17 @@
                                 const val = row[colIdx];
                                 return val !== undefined && val !== null ? val : '';
                             });
+
+                            // Cek duplikat berdasarkan kolom terakhir (URL)
+                            const lastColValue = String(newRow[lastColIndex] || '').trim().toLowerCase();
+                            if (lastColValue !== '' && seenKeys.has(lastColValue)) {
+                                duplicateCount++;
+                                continue; // skip baris duplikat
+                            }
+                            if (lastColValue !== '') {
+                                seenKeys.add(lastColValue);
+                            }
+
                             mergedData.push(newRow);
                         }
                     });
@@ -1190,7 +1204,10 @@
                     updateUI();
 
                     const totalRows = mergedData.length - 1;
-                    showToast(`Berhasil digabungkan! Total: ${totalRows} baris data.`, 'success');
+                    const dupMsg = duplicateCount > 0
+                        ? ` (${duplicateCount} baris duplikat dihapus berdasarkan kolom "${referenceColumns[lastColIndex]}")`
+                        : '';
+                    showToast(`Berhasil digabungkan! Total: ${totalRows} baris data.${dupMsg}`, 'success');
 
                     // Scroll to preview
                     previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
