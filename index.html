@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         *,
         *::before,
@@ -1006,6 +1007,40 @@
         }
 
         function readFile(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            
+            if (ext === 'csv') {
+                Papa.parse(file, {
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const jsonData = results.data;
+                        if (jsonData.length === 0) {
+                            showToast(`"${file.name}" kosong, dilewati.`, 'error');
+                            return;
+                        }
+                        
+                        uploadedFiles.push({
+                            name: file.name,
+                            size: file.size,
+                            sheetName: 'CSV',
+                            data: jsonData,
+                            rows: jsonData.length - 1,
+                        });
+
+                        if (uploadedFiles.length === 1) {
+                            referenceColumns = jsonData[0].map(c => String(c).trim());
+                        }
+
+                        updateUI();
+                        showToast(`"${file.name}" berhasil dimuat (${jsonData.length - 1} baris)`, 'success');
+                    },
+                    error: function(err) {
+                        showToast(`Gagal membaca "${file.name}": ${err.message}`, 'error');
+                    }
+                });
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = e => {
                 try {
@@ -1289,9 +1324,21 @@
         function downloadCSV() {
             if (!mergedReady || mergedData.length === 0) return;
 
-            const ws = XLSX.utils.aoa_to_sheet(mergedData);
-            const csv = XLSX.utils.sheet_to_csv(ws);
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            // Generate CSV manually to save memory (avoids SheetJS overhead for large datasets)
+            let csvContent = '';
+            for (let i = 0; i < mergedData.length; i++) {
+                const row = mergedData[i].map(cell => {
+                    let cellStr = cell === null || cell === undefined ? '' : String(cell);
+                    // Handle commas, quotes, and newlines by wrapping in quotes
+                    if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                        cellStr = '"' + cellStr.replace(/"/g, '""') + '"';
+                    }
+                    return cellStr;
+                });
+                csvContent += row.join(',') + '\n';
+            }
+
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
