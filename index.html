@@ -881,6 +881,20 @@
             <div class="columns-grid" id="columnsGrid"></div>
         </div>
 
+        <!-- Sort Options -->
+        <div class="columns-section" id="sortSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <polyline points="19 12 12 19 5 12" />
+                    </svg>
+                    Urutkan Berdasarkan (Opsional, klik kolom di bawah)
+                </div>
+            </div>
+            <div class="columns-grid" id="sortGrid"></div>
+        </div>
+
         <!-- Actions -->
         <div class="actions" id="actionsSection" style="display:none;">
             <button class="btn btn-primary" id="mergeBtn" onclick="mergeFiles()">
@@ -937,6 +951,7 @@
         let referenceColumns = [];    // string[]
         let mergedData = [];          // [[...], ...]
         let mergedReady = false;
+        let sortColumnsIdx = [];      // number[]
 
         // ─── DOM refs ────────────────────────────────────────────────
         const dropZone = document.getElementById('dropZone');
@@ -946,6 +961,8 @@
         const fileCount = document.getElementById('fileCount');
         const columnsSection = document.getElementById('columnsSection');
         const columnsGrid = document.getElementById('columnsGrid');
+        const sortSection = document.getElementById('sortSection');
+        const sortGrid = document.getElementById('sortGrid');
         const actionsSection = document.getElementById('actionsSection');
         const previewSection = document.getElementById('previewSection');
         const tableWrapper = document.getElementById('tableWrapper');
@@ -1029,6 +1046,8 @@
 
                         if (uploadedFiles.length === 1) {
                             referenceColumns = jsonData[0].map(c => String(c).trim());
+                            const noIdx = referenceColumns.findIndex(col => col.toLowerCase() === 'no');
+                            sortColumnsIdx = noIdx !== -1 ? [noIdx] : [];
                         }
 
                         updateUI();
@@ -1066,6 +1085,8 @@
                     // If first file, set reference columns
                     if (uploadedFiles.length === 1) {
                         referenceColumns = jsonData[0].map(c => String(c).trim());
+                        const noIdx = referenceColumns.findIndex(col => col.toLowerCase() === 'no');
+                        sortColumnsIdx = noIdx !== -1 ? [noIdx] : [];
                     }
 
                     updateUI();
@@ -1083,6 +1104,7 @@
 
             fileListSection.style.display = hasFiles ? 'block' : 'none';
             columnsSection.style.display = hasFiles ? 'block' : 'none';
+            sortSection.style.display = hasFiles ? 'block' : 'none';
             actionsSection.style.display = uploadedFiles.length >= 1 ? 'flex' : 'none';
 
             fileCount.textContent = uploadedFiles.length;
@@ -1094,6 +1116,7 @@
 
             renderFileList();
             renderColumns();
+            renderSortOptions();
         }
 
         function renderFileList() {
@@ -1131,14 +1154,44 @@
             `).join('');
         }
 
+        function toggleSortColumn(colIdx) {
+            const pos = sortColumnsIdx.indexOf(colIdx);
+            if (pos > -1) {
+                sortColumnsIdx.splice(pos, 1);
+            } else {
+                sortColumnsIdx.push(colIdx);
+            }
+            renderSortOptions();
+        }
+
+        function renderSortOptions() {
+            if (referenceColumns.length === 0) {
+                sortGrid.innerHTML = '<span style="color:var(--text-muted);font-size:13px;">Belum ada kolom.</span>';
+                return;
+            }
+            sortGrid.innerHTML = referenceColumns.map((col, i) => {
+                const isSelected = sortColumnsIdx.includes(i);
+                const sortOrder = sortColumnsIdx.indexOf(i) + 1;
+                return `
+                <div class="column-tag sort-tag" onclick="toggleSortColumn(${i})" style="cursor:pointer; transition:all 0.2s; ${isSelected ? 'border-color:var(--accent); background:rgba(79, 124, 255, 0.1); color:var(--accent);' : ''}">
+                    ${isSelected ? `<span class="col-index" style="color:var(--accent);">${sortOrder}</span>` : ''}
+                    ${escapeHtml(col || '(kosong)')}
+                </div>
+                `;
+            }).join('');
+        }
+
         // ─── File management ────────────────────────────────────────
         function removeFile(index) {
             uploadedFiles.splice(index, 1);
             if (index === 0 && uploadedFiles.length > 0) {
                 // Recalculate reference columns from new first file
                 referenceColumns = uploadedFiles[0].data[0].map(c => String(c).trim());
+                const noIdx = referenceColumns.findIndex(col => col.toLowerCase() === 'no');
+                sortColumnsIdx = noIdx !== -1 ? [noIdx] : [];
             } else if (uploadedFiles.length === 0) {
                 referenceColumns = [];
+                sortColumnsIdx = [];
             }
             mergedReady = false;
             mergedData = [];
@@ -1149,6 +1202,7 @@
         function clearAllFiles() {
             uploadedFiles = [];
             referenceColumns = [];
+            sortColumnsIdx = [];
             mergedData = [];
             mergedReady = false;
             previewSection.style.display = 'none';
@@ -1170,6 +1224,7 @@
         function reUpload() {
             uploadedFiles = [];
             referenceColumns = [];
+            sortColumnsIdx = [];
             mergedData = [];
             mergedReady = false;
             previewSection.style.display = 'none';
@@ -1219,17 +1274,31 @@
                         }
                     });
 
-                    // Sort berdasarkan kolom "No"
-                    const noColIndex = referenceColumns.findIndex(
-                        col => col.toLowerCase() === 'no'
-                    );
-                    if (noColIndex !== -1) {
+                    // Sorting berdasarkan kolom yang dipilih
+                    if (sortColumnsIdx.length > 0) {
                         const header = mergedData[0];
                         const dataRows = mergedData.slice(1);
                         dataRows.sort((a, b) => {
-                            const valA = parseFloat(a[noColIndex]) || 0;
-                            const valB = parseFloat(b[noColIndex]) || 0;
-                            return valA - valB;
+                            for (let idx of sortColumnsIdx) {
+                                const valA = a[idx];
+                                const valB = b[idx];
+                                
+                                const numA = parseFloat(valA);
+                                const numB = parseFloat(valB);
+                                
+                                const isNumA = !isNaN(numA) && String(valA).trim() !== '';
+                                const isNumB = !isNaN(numB) && String(valB).trim() !== '';
+
+                                if (isNumA && isNumB) {
+                                    if (numA !== numB) return numA - numB;
+                                } else {
+                                    const strA = String(valA || '').toLowerCase();
+                                    const strB = String(valB || '').toLowerCase();
+                                    if (strA < strB) return -1;
+                                    if (strA > strB) return 1;
+                                }
+                            }
+                            return 0;
                         });
                         mergedData = [header, ...dataRows];
                     }
