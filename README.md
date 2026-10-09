@@ -41,6 +41,11 @@ Aplikasi web modern berbasis client-side untuk mengolah data file Excel (.xlsx, 
   - Indikator bar progres visual dengan persentase *real-time* (pada pengompresan ZIP dan unduh berurutan).
   - Memberikan feedback visual yang jelas dan responsif saat browser memproses data besar.
 
+### 4. Tampilan File Terunggah Minimalis & Kompak
+- **Tata Letak Grid Responsif**: Menggunakan multi-kolom responsif sehingga tidak memanjang ke bawah ketika mengunggah puluhan hingga ratusan berkas sekaligus.
+- **Scrollbar Halus & Ketinggian Terkendali**: Batas ketinggian maksimal (*max-height: 230px*) dengan scrollbar halus terintegrasi menjaga antarmuka tetap rapi dan ringkas.
+- **Kartu Berkas Ringkas**: Informasi ukuran file, jumlah baris, dan jumlah kolom tertata rapi dengan pemisah titik minimalis, teks nama file terpotong elegan jika terlalu panjang (*ellipsis*), serta *tooltip* nama lengkap saat kursor diarahkan ke file.
+
 ---
 
 ## Cara Menjalankan
