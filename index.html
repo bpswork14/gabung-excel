@@ -714,6 +714,171 @@
             color: var(--text-secondary);
         }
 
+        /* Multi-column Split Rules */
+        .split-rules-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: rgba(13, 19, 34, 0.55);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 18px;
+        }
+
+        .split-rules-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .split-rules-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .split-rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .split-rule-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 16px;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .split-rule-item:hover {
+            border-color: rgba(79, 124, 255, 0.45);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .split-rule-order {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 46px;
+        }
+
+        .split-order-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .split-order-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .split-rule-content {
+            display: grid;
+            grid-template-columns: minmax(200px, 1.2fr) minmax(260px, 1.5fr);
+            gap: 14px;
+            align-items: start;
+        }
+
+        @media (max-width: 840px) {
+            .split-rule-item {
+                grid-template-columns: 1fr;
+            }
+            .split-rule-order {
+                flex-direction: row;
+                gap: 8px;
+            }
+            .split-rule-content {
+                grid-template-columns: 1fr;
+            }
+            .split-rule-actions {
+                justify-content: flex-end;
+            }
+        }
+
+        .split-rule-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rule-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rule-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .rule-btn:hover:not(:disabled) {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--accent);
+        }
+
+        .rule-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .rule-btn.danger:hover:not(:disabled) {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border-color: rgba(248, 113, 113, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px !important;
+            font-size: 12.5px !important;
+        }
+
+        .badge-text-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+        }
+
         /* Stats Cards */
         .stats-grid {
             display: grid;
@@ -1530,76 +1695,65 @@
 
             <!-- Split Configuration Card -->
             <div class="config-card" id="splitConfigSection" style="display:none;">
-                <div class="section-title" style="font-size:16px;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-                    </svg>
-                    Konfigurasi Referensi & Format Split
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="section-title" style="font-size:16px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+                        </svg>
+                        Konfigurasi Referensi & Format Split
+                    </div>
+                    <span class="badge-text-tag" title="Semua kolom output berformat teks murni agar nomor besar tidak berubah menjadi notasi E">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        Output Tipe Teks Murni (Bebas Notasi E)
+                    </span>
                 </div>
 
-                <div class="config-grid">
-                    <!-- 1. Kolom Referensi -->
-                    <div class="form-group">
-                        <label class="form-label" for="splitColumnSelect">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2" />
-                                <line x1="9" y1="3" x2="9" y2="21" />
-                            </svg>
-                            Kolom Referensi Split
-                        </label>
-                        <select class="form-select" id="splitColumnSelect" onchange="onSplitConfigChange()">
-                            <!-- Generated options -->
-                        </select>
-                        <div class="form-hint" id="splitColumnSample">Nilai sampel baris 1: -</div>
-                    </div>
-
-                    <!-- 2. Karakter Dari Kiri -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="4 7 4 4 20 4 20 7" />
-                                <line x1="9" y1="20" x2="15" y2="20" />
-                                <line x1="12" y1="4" x2="12" y2="20" />
-                            </svg>
-                            Aturan Pemotongan Karakter
-                        </label>
-                        <div class="segmented-options">
-                            <div class="segmented-option active" id="splitModePrefix" onclick="setSplitMode('prefix')">
-                                N Digit dari Kiri
-                            </div>
-                            <div class="segmented-option" id="splitModeFull" onclick="setSplitMode('full')">
-                                Seluruh Isi Kolom
+                <!-- Multi-Column Split Rules Container -->
+                <div class="split-rules-container">
+                    <div class="split-rules-header">
+                        <div>
+                            <span class="split-rules-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                                Kolom Acuan Pemisahan (Berurutan / Ordered)
+                            </span>
+                            <div class="form-hint" style="margin-top:2px;">
+                                Pisahkan data berdasarkan 1 atau beberapa kolom. Urutan (#1, #2, dst.) menentukan hierarki pemisahan serta urutan nama file output.
                             </div>
                         </div>
-                        <div id="splitPrefixInputGroup" style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-                            <span style="font-size:12.5px; color:var(--text-secondary); white-space:nowrap;">Panjang Karakter:</span>
-                            <input type="number" id="splitCharLength" min="1" max="100" value="4" class="form-control"
-                                style="max-width:90px;" oninput="onSplitConfigChange()">
-                            <span style="font-size:12px; color:var(--text-muted);">(contoh: 4 digit kolom A)</span>
-                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btnAddSplitCol" onclick="addSplitColumnRule()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Tambah Kolom Acuan
+                        </button>
                     </div>
 
-                    <!-- 3. Custom Nama Output -->
-                    <div class="form-group">
-                        <label class="form-label" for="splitCustomName">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
-                            Inputan Nama Output Kustom
-                        </label>
-                        <input type="text" id="splitCustomName" class="form-control"
-                            placeholder="Contoh: rekap_kecamatan / laporan" oninput="onSplitConfigChange()">
-                        <div class="form-hint">Bebas diisi untuk melengkapi nama file output.</div>
+                    <div id="splitRulesList" class="split-rules-list">
+                        <!-- Populated dynamically via JS -->
                     </div>
+                </div>
+
+                <!-- Custom Nama Output -->
+                <div class="form-group" style="margin-top:2px;">
+                    <label class="form-label" for="splitCustomName">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        Inputan Nama Output Kustom (Opsional)
+                    </label>
+                    <input type="text" id="splitCustomName" class="form-control"
+                        placeholder="Contoh: rekap_kecamatan / laporan_kabupaten" oninput="onSplitConfigChange()">
+                    <div class="form-hint">Teks tambahan opsional yang disematkan ke dalam nama file pecahan.</div>
                 </div>
 
                 <!-- Live Filename Preview Box -->
                 <div class="preview-box">
                     <div class="preview-box-header">
                         <span>Format & Pratinjau Nama File Output</span>
-                        <span>[referensi split]_[inputan user]_[timestamp]</span>
+                        <span id="splitFilenamePatternHint">[ref_1]_[inputan user]_[timestamp].xlsx</span>
                     </div>
                     <div class="preview-box-content" id="splitFilenamePreview">
                         3201_rekap_kecamatan_20261009_145022.xlsx
@@ -1732,8 +1886,9 @@
         // ─── State: Split Excel ──────────────────────────────────────
         let splitUploadedFiles = [];   // { name, size, data: [[...], ...], sheetName }
         let splitRefColumns = [];      // string[] (dari file pertama)
-        let splitModeType = 'prefix';  // 'prefix' | 'full'
-        let splitGroups = [];          // [ { key, filename, rows: [[...], ...], count } ]
+        let splitConfigs = [];         // [ { id, colIndex, mode: 'prefix'|'full', charLength } ]
+        let splitConfigIdCounter = 1;
+        let splitGroups = [];          // [ { key, keyParts, fileKey, filename, rows: [[...], ...], count } ]
         let splitReady = false;
         let selectedSplitPreviewKey = null;
 
@@ -1768,11 +1923,9 @@
         const splitFileList = document.getElementById('splitFileList');
         const splitFileCount = document.getElementById('splitFileCount');
         const splitConfigSection = document.getElementById('splitConfigSection');
-        const splitColumnSelect = document.getElementById('splitColumnSelect');
-        const splitColumnSample = document.getElementById('splitColumnSample');
-        const splitCharLength = document.getElementById('splitCharLength');
-        const splitPrefixInputGroup = document.getElementById('splitPrefixInputGroup');
+        const splitRulesList = document.getElementById('splitRulesList');
         const splitCustomName = document.getElementById('splitCustomName');
+        const splitFilenamePatternHint = document.getElementById('splitFilenamePatternHint');
         const splitFilenamePreview = document.getElementById('splitFilenamePreview');
         const splitPreviewExplanation = document.getElementById('splitPreviewExplanation');
         const splitProcessBtn = document.getElementById('splitProcessBtn');
@@ -2215,16 +2368,7 @@
 
             setTimeout(() => {
                 try {
-                    const ws = XLSX.utils.aoa_to_sheet(mergedData);
-                    const colWidths = mergedData[0].map((_, colIdx) => {
-                        let maxLen = 10;
-                        mergedData.forEach(row => {
-                            const val = String(row[colIdx] || '');
-                            if (val.length > maxLen) maxLen = val.length;
-                        });
-                        return { wch: Math.min(maxLen + 2, 40) };
-                    });
-                    ws['!cols'] = colWidths;
+                    const ws = createTextSheet(mergedData);
 
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Gabungan');
@@ -2355,7 +2499,7 @@
 
                     if (splitUploadedFiles.length === 1) {
                         splitRefColumns = parsed.data[0].map(c => String(c).trim());
-                        populateSplitColumnSelect();
+                        initSplitConfigs();
                     }
                     successCount++;
                 } catch (err) {
@@ -2420,10 +2564,11 @@
             splitUploadedFiles.splice(index, 1);
             if (index === 0 && splitUploadedFiles.length > 0) {
                 splitRefColumns = splitUploadedFiles[0].data[0].map(c => String(c).trim());
-                populateSplitColumnSelect();
+                validateAndFixSplitConfigs();
             } else if (splitUploadedFiles.length === 0) {
                 splitRefColumns = [];
-                splitColumnSelect.innerHTML = '';
+                splitConfigs = [];
+                renderSplitRulesList();
             }
             splitReady = false;
             splitGroups = [];
@@ -2435,12 +2580,14 @@
         function clearSplitFiles() {
             splitUploadedFiles = [];
             splitRefColumns = [];
+            splitConfigs = [];
             splitGroups = [];
             splitReady = false;
             splitResultSection.style.display = 'none';
             splitGroupDetailSection.style.display = 'none';
             dropZoneSplit.classList.remove('disabled');
             fileInputSplit.disabled = false;
+            renderSplitRulesList();
             updateSplitUI();
         }
 
@@ -2450,20 +2597,205 @@
             dropZoneSplit.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        function populateSplitColumnSelect() {
-            splitColumnSelect.innerHTML = splitRefColumns.map((col, idx) => {
-                const colLetter = getColumnLetter(idx);
-                return `<option value="${idx}">Kolom ${colLetter} — ${escapeHtml(col || '(tanpa judul)')}</option>`;
-            }).join('');
+        function initSplitConfigs() {
+            splitConfigIdCounter = 1;
+            splitConfigs = [
+                {
+                    id: splitConfigIdCounter++,
+                    colIndex: 0,
+                    mode: 'prefix',
+                    charLength: 4
+                }
+            ];
+            renderSplitRulesList();
             onSplitConfigChange();
         }
 
-        function setSplitMode(mode) {
-            splitModeType = mode;
-            document.getElementById('splitModePrefix').classList.toggle('active', mode === 'prefix');
-            document.getElementById('splitModeFull').classList.toggle('active', mode === 'full');
-            splitPrefixInputGroup.style.display = mode === 'prefix' ? 'flex' : 'none';
+        function validateAndFixSplitConfigs() {
+            if (splitRefColumns.length === 0) {
+                splitConfigs = [];
+            } else {
+                splitConfigs.forEach(cfg => {
+                    if (cfg.colIndex >= splitRefColumns.length) {
+                        cfg.colIndex = 0;
+                    }
+                });
+                if (splitConfigs.length === 0) {
+                    initSplitConfigs();
+                }
+            }
+            renderSplitRulesList();
             onSplitConfigChange();
+        }
+
+        function addSplitColumnRule() {
+            if (splitRefColumns.length === 0) {
+                showToast('Unggah file terlebih dahulu.', 'error');
+                return;
+            }
+
+            // Find an unselected column if available
+            const usedIndices = splitConfigs.map(c => c.colIndex);
+            let nextIdx = 0;
+            for (let i = 0; i < splitRefColumns.length; i++) {
+                if (!usedIndices.includes(i)) {
+                    nextIdx = i;
+                    break;
+                }
+            }
+            if (nextIdx === 0 && usedIndices.includes(0)) {
+                nextIdx = (splitConfigs[splitConfigs.length - 1]?.colIndex + 1) % splitRefColumns.length || 0;
+            }
+
+            splitConfigs.push({
+                id: splitConfigIdCounter++,
+                colIndex: nextIdx,
+                mode: 'full', // default subsequent columns to full
+                charLength: 4
+            });
+
+            renderSplitRulesList();
+            onSplitConfigChange();
+            showToast(`Kolom acuan #${splitConfigs.length} ditambahkan!`, 'info');
+        }
+
+        function moveSplitRuleUp(index) {
+            if (index <= 0 || index >= splitConfigs.length) return;
+            const temp = splitConfigs[index];
+            splitConfigs[index] = splitConfigs[index - 1];
+            splitConfigs[index - 1] = temp;
+            renderSplitRulesList();
+            onSplitConfigChange();
+        }
+
+        function moveSplitRuleDown(index) {
+            if (index < 0 || index >= splitConfigs.length - 1) return;
+            const temp = splitConfigs[index];
+            splitConfigs[index] = splitConfigs[index + 1];
+            splitConfigs[index + 1] = temp;
+            renderSplitRulesList();
+            onSplitConfigChange();
+        }
+
+        function removeSplitRule(index) {
+            if (splitConfigs.length <= 1) {
+                showToast('Minimal harus ada 1 kolom acuan split.', 'info');
+                return;
+            }
+            splitConfigs.splice(index, 1);
+            renderSplitRulesList();
+            onSplitConfigChange();
+        }
+
+        function updateSplitRuleCol(index, newColIdx) {
+            if (splitConfigs[index]) {
+                splitConfigs[index].colIndex = parseInt(newColIdx, 10);
+                onSplitConfigChange();
+            }
+        }
+
+        function updateSplitRuleMode(index, newMode) {
+            if (splitConfigs[index]) {
+                splitConfigs[index].mode = newMode;
+                renderSplitRulesList();
+                onSplitConfigChange();
+            }
+        }
+
+        function updateSplitRuleCharLen(index, newLen) {
+            if (splitConfigs[index]) {
+                let val = parseInt(newLen, 10);
+                if (isNaN(val) || val < 1) val = 1;
+                splitConfigs[index].charLength = val;
+                onSplitConfigChange();
+            }
+        }
+
+        function renderSplitRulesList() {
+            if (!splitRulesList) return;
+
+            if (splitRefColumns.length === 0) {
+                splitRulesList.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:10px 0;">Belum ada file yang diunggah.</div>';
+                return;
+            }
+
+            splitRulesList.innerHTML = splitConfigs.map((cfg, idx) => {
+                const isFirst = idx === 0;
+                const isLast = idx === splitConfigs.length - 1;
+                const canDelete = splitConfigs.length > 1;
+
+                const optionsHtml = splitRefColumns.map((col, cIdx) => {
+                    const letter = getColumnLetter(cIdx);
+                    const isSelected = cIdx === cfg.colIndex;
+                    return `<option value="${cIdx}" ${isSelected ? 'selected' : ''}>Kolom ${letter} — ${escapeHtml(col || '(tanpa judul)')}</option>`;
+                }).join('');
+
+                return `
+                    <div class="split-rule-item">
+                        <div class="split-rule-order">
+                            <div class="split-order-badge">#${idx + 1}</div>
+                            <div class="split-order-label">${idx === 0 ? 'Utama' : 'Sub-' + idx}</div>
+                        </div>
+
+                        <div class="split-rule-content">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label" style="font-size:12px; margin-bottom:2px;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" /><line x1="9" y1="3" x2="9" y2="21" />
+                                    </svg>
+                                    Kolom Acuan
+                                </label>
+                                <select class="form-select" style="padding:9px 12px; font-size:13px;" onchange="updateSplitRuleCol(${idx}, this.value)">
+                                    ${optionsHtml}
+                                </select>
+                                <div class="form-hint" id="ruleSample_${idx}" style="font-size:11.5px; margin-top:3px;">Sampel: -</div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label" style="font-size:12px; margin-bottom:2px;">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="4 7 4 4 20 4 20 7" /><line x1="9" y1="20" x2="15" y2="20" /><line x1="12" y1="4" x2="12" y2="20" />
+                                    </svg>
+                                    Aturan Pemotongan
+                                </label>
+                                <div style="display:flex; flex-direction:column; gap:6px;">
+                                    <div class="segmented-options">
+                                        <div class="segmented-option ${cfg.mode === 'prefix' ? 'active' : ''}"
+                                            onclick="updateSplitRuleMode(${idx}, 'prefix')" style="padding:7px 10px; font-size:12px;">
+                                            N Digit dari Kiri
+                                        </div>
+                                        <div class="segmented-option ${cfg.mode === 'full' ? 'active' : ''}"
+                                            onclick="updateSplitRuleMode(${idx}, 'full')" style="padding:7px 10px; font-size:12px;">
+                                            Seluruh Isi Kolom
+                                        </div>
+                                    </div>
+                                    ${cfg.mode === 'prefix' ? `
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">Panjang:</span>
+                                            <input type="number" min="1" max="100" value="${cfg.charLength || 4}" class="form-control"
+                                                style="max-width:75px; padding:6px 10px; font-size:12.5px;"
+                                                oninput="updateSplitRuleCharLen(${idx}, this.value)">
+                                            <span style="font-size:11.5px; color:var(--text-muted);">digit/karakter</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="split-rule-actions">
+                            <button type="button" class="rule-btn" onclick="moveSplitRuleUp(${idx})" ${isFirst ? 'disabled' : ''} title="Geser Urutan ke Atas (Prioritas #${idx})">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+                            </button>
+                            <button type="button" class="rule-btn" onclick="moveSplitRuleDown(${idx})" ${isLast ? 'disabled' : ''} title="Geser Urutan ke Bawah (Prioritas #${idx + 2})">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <button type="button" class="rule-btn danger" onclick="removeSplitRule(${idx})" ${!canDelete ? 'disabled' : ''} title="Hapus Kolom Acuan Ini">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function getColumnLetter(index) {
@@ -2477,51 +2809,71 @@
         }
 
         function onSplitConfigChange() {
-            if (splitRefColumns.length === 0 || splitUploadedFiles.length === 0) return;
+            if (splitRefColumns.length === 0 || splitUploadedFiles.length === 0 || splitConfigs.length === 0) return;
 
-            const selectedColIdx = parseInt(splitColumnSelect.value || '0', 10);
             const firstFileData = splitUploadedFiles[0].data;
+            const sampleParts = [];
+            const patternParts = [];
+            const explanationParts = [];
 
-            // Extract sample value from first non-empty data row
-            let sampleVal = '';
-            for (let r = 1; r < firstFileData.length; r++) {
-                const v = firstFileData[r][selectedColIdx];
-                if (v !== undefined && v !== null && String(v).trim() !== '') {
-                    sampleVal = String(v).trim();
-                    break;
+            splitConfigs.forEach((cfg, idx) => {
+                const colIdx = cfg.colIndex;
+                let sampleVal = '';
+                for (let r = 1; r < firstFileData.length; r++) {
+                    const v = firstFileData[r][colIdx];
+                    if (v !== undefined && v !== null && String(v).trim() !== '') {
+                        sampleVal = String(v).trim();
+                        break;
+                    }
                 }
-            }
+                if (!sampleVal) sampleVal = '123456';
 
-            if (!sampleVal) sampleVal = '12345678';
+                let extractedKey = '';
+                const sampleEl = document.getElementById(`ruleSample_${idx}`);
 
-            let charLen = parseInt(splitCharLength.value || '4', 10);
-            if (isNaN(charLen) || charLen < 1) charLen = 4;
+                if (cfg.mode === 'prefix') {
+                    const len = Math.max(1, parseInt(cfg.charLength, 10) || 4);
+                    extractedKey = sampleVal.substring(0, len);
+                    if (sampleEl) {
+                        sampleEl.innerHTML = `Sampel: <strong>"${escapeHtml(sampleVal)}"</strong> &rarr; <span class="badge-split-key">${escapeHtml(extractedKey || '(kosong)')}</span>`;
+                    }
+                    explanationParts.push(`Kolom ${getColumnLetter(colIdx)} (${len} digit)`);
+                } else {
+                    extractedKey = sampleVal;
+                    if (sampleEl) {
+                        sampleEl.innerHTML = `Sampel: <strong>"${escapeHtml(sampleVal)}"</strong> &rarr; <span class="badge-split-key">${escapeHtml(extractedKey || '(kosong)')}</span> (penuh)`;
+                    }
+                    explanationParts.push(`Kolom ${getColumnLetter(colIdx)} (seluruh isi)`);
+                }
 
-            let extractedKey = '';
-            if (splitModeType === 'prefix') {
-                extractedKey = sampleVal.substring(0, charLen);
-                splitColumnSample.innerHTML = `Contoh sampel baris: <strong>"${escapeHtml(sampleVal)}"</strong> &rarr; Referensi Split: <span class="badge-split-key">${escapeHtml(extractedKey || '(kosong)')}</span>`;
-            } else {
-                extractedKey = sampleVal;
-                splitColumnSample.innerHTML = `Contoh sampel baris: <strong>"${escapeHtml(sampleVal)}"</strong> (seluruh isi kolom digunakan sebagai referensi)`;
-            }
+                sampleParts.push(sanitizeForFilename(extractedKey) || `REF${idx + 1}`);
+                patternParts.push(`[ref_${idx + 1}]`);
+            });
 
             // Custom name from user
             const rawCustom = (splitCustomName.value || '').trim();
             const safeCustom = sanitizeForFilename(rawCustom);
-            const safeKey = sanitizeForFilename(extractedKey) || 'REF';
             const sampleTimestamp = getTimestamp();
 
-            // Format: [referensi split]_[inputan user]_[timestamp]
+            const combinedKey = sampleParts.join('_');
+            const patternHintStr = patternParts.join('_') + (safeCustom ? `_${safeCustom}` : '') + `_[timestamp].xlsx`;
+
             let previewName = '';
             if (safeCustom) {
-                previewName = `${safeKey}_${safeCustom}_${sampleTimestamp}.xlsx`;
+                previewName = `${combinedKey}_${safeCustom}_${sampleTimestamp}.xlsx`;
             } else {
-                previewName = `${safeKey}_${sampleTimestamp}.xlsx`;
+                previewName = `${combinedKey}_${sampleTimestamp}.xlsx`;
             }
 
-            splitFilenamePreview.textContent = previewName;
-            splitPreviewExplanation.innerHTML = `Format nama: <code>[referensi split]_${safeCustom ? escapeHtml(safeCustom) + '_' : ''}[timestamp].xlsx</code>`;
+            if (splitFilenamePatternHint) {
+                splitFilenamePatternHint.textContent = patternHintStr;
+            }
+            if (splitFilenamePreview) {
+                splitFilenamePreview.textContent = previewName;
+            }
+            if (splitPreviewExplanation) {
+                splitPreviewExplanation.innerHTML = `Urutan pemisahan (${splitConfigs.length} kolom): <strong>${explanationParts.join(' &rarr; ')}</strong>. <span style="color:#34d399; font-weight:600;">Semua kolom output berformat teks murni (bebas notasi E).</span>`;
+            }
         }
 
         function sanitizeForFilename(str) {
@@ -2533,10 +2885,48 @@
                 .trim();
         }
 
-        // ─── Process Split Function ──────────────────────────────────
+        // ─── Create Pure Text Worksheet (Guarantees No Scientific E) ─
+        function createTextSheet(aoaRows) {
+            const ws = XLSX.utils.aoa_to_sheet(aoaRows, { cellDates: false });
+            const range = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']) : null;
+            if (range) {
+                const numCols = range.e.c - range.s.c + 1;
+                const colWidths = new Array(numCols).fill(10);
+
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        const cellAddr = XLSX.utils.encode_cell({ r: R, c: C });
+                        let cell = ws[cellAddr];
+                        if (!cell) {
+                            cell = { t: 's', v: '' };
+                            ws[cellAddr] = cell;
+                        }
+                        const valStr = cell.v !== undefined && cell.v !== null ? String(cell.v) : '';
+                        cell.t = 's'; // Force type to String / Text
+                        cell.v = valStr;
+                        cell.w = valStr;
+                        cell.z = '@'; // Explicit Excel text format code '@'
+
+                        const colOffset = C - range.s.c;
+                        if (valStr.length > colWidths[colOffset]) {
+                            colWidths[colOffset] = valStr.length;
+                        }
+                    }
+                }
+
+                ws['!cols'] = colWidths.map(w => ({ wch: Math.min(w + 3, 50) }));
+            }
+            return ws;
+        }
+
+        // ─── Process Split Function (Multi-Column Ordered) ───────────
         function processSplit() {
             if (splitUploadedFiles.length === 0) {
                 showToast('Unggah file terlebih dahulu untuk dipisahkan.', 'error');
+                return;
+            }
+            if (splitConfigs.length === 0) {
+                showToast('Tentukan minimal satu kolom acuan split.', 'error');
                 return;
             }
 
@@ -2545,54 +2935,66 @@
 
             setTimeout(() => {
                 try {
-                    const selectedColIdx = parseInt(splitColumnSelect.value || '0', 10);
-                    let charLen = parseInt(splitCharLength.value || '4', 10);
-                    if (isNaN(charLen) || charLen < 1) charLen = 4;
-
                     const rawCustom = (splitCustomName.value || '').trim();
                     const safeCustom = sanitizeForFilename(rawCustom);
                     const processTimestamp = getTimestamp();
 
                     // Structure follows file 1 (splitRefColumns)
                     const headerRow = splitRefColumns.slice();
-                    const groupsMap = new Map(); // key -> Array of data rows
+                    const groupsMap = new Map(); // compositeKey -> { displayKey, keyParts, fileKey, rows: [] }
 
                     splitUploadedFiles.forEach(file => {
                         const fileHeader = file.data[0].map(c => String(c).trim());
                         // Map each column of file 1 to file's columns
                         const colMap = splitRefColumns.map(refCol => fileHeader.indexOf(refCol));
 
-                        // Also find the index of the split column in this file
-                        const fileSplitColIdx = fileHeader.indexOf(splitRefColumns[selectedColIdx]);
+                        // Find index of each split rule's column in this file
+                        const ruleColIndicesInFile = splitConfigs.map(cfg => {
+                            const refColName = splitRefColumns[cfg.colIndex];
+                            return fileHeader.indexOf(refColName);
+                        });
 
                         for (let r = 1; r < file.data.length; r++) {
                             const row = file.data[r];
                             if (row.every(cell => cell === '' || cell === null || cell === undefined)) continue;
 
-                            // Determine split key for this row
-                            let rawCellVal = '';
-                            if (fileSplitColIdx !== -1 && row[fileSplitColIdx] !== undefined && row[fileSplitColIdx] !== null) {
-                                rawCellVal = String(row[fileSplitColIdx]).trim();
-                            }
+                            // Extract key parts in order
+                            const keyParts = splitConfigs.map((cfg, cfgIdx) => {
+                                const fileColIdx = ruleColIndicesInFile[cfgIdx];
+                                let rawCellVal = '';
+                                if (fileColIdx !== -1 && row[fileColIdx] !== undefined && row[fileColIdx] !== null) {
+                                    rawCellVal = String(row[fileColIdx]).trim();
+                                }
 
-                            let rowKey = '';
-                            if (splitModeType === 'prefix') {
-                                rowKey = rawCellVal ? rawCellVal.substring(0, charLen) : 'KOSONG';
-                            } else {
-                                rowKey = rawCellVal || 'KOSONG';
-                            }
+                                if (cfg.mode === 'prefix') {
+                                    const len = Math.max(1, parseInt(cfg.charLength, 10) || 4);
+                                    return rawCellVal ? rawCellVal.substring(0, len) : 'KOSONG';
+                                } else {
+                                    return rawCellVal || 'KOSONG';
+                                }
+                            });
 
-                            // Align row to file 1's column structure
+                            const compositeKey = keyParts.join(' - ');
+                            const fileKey = keyParts.map(p => sanitizeForFilename(p) || 'KOSONG').join('_');
+
+                            // Standardize row - FORCE TO STRING (TEXT) to avoid scientific notation E!
                             const standardizedRow = colMap.map(colIdx => {
                                 if (colIdx === -1) return '';
                                 const val = row[colIdx];
-                                return val !== undefined && val !== null ? val : '';
+                                if (val === undefined || val === null) return '';
+                                if (val instanceof Date) return val.toLocaleDateString('id-ID');
+                                return String(val); // Always text string!
                             });
 
-                            if (!groupsMap.has(rowKey)) {
-                                groupsMap.set(rowKey, []);
+                            if (!groupsMap.has(compositeKey)) {
+                                groupsMap.set(compositeKey, {
+                                    displayKey: compositeKey,
+                                    keyParts: keyParts,
+                                    fileKey: fileKey,
+                                    rows: []
+                                });
                             }
-                            groupsMap.get(rowKey).push(standardizedRow);
+                            groupsMap.get(compositeKey).rows.push(standardizedRow);
                         }
                     });
 
@@ -2600,28 +3002,41 @@
                     splitGroups = [];
                     let totalRowsProcessed = 0;
 
-                    for (const [key, rows] of groupsMap.entries()) {
-                        const safeKey = sanitizeForFilename(key) || 'KOSONG';
+                    for (const groupData of groupsMap.values()) {
                         let filenameBase = safeCustom
-                            ? `${safeKey}_${safeCustom}_${processTimestamp}`
-                            : `${safeKey}_${processTimestamp}`;
+                            ? `${groupData.fileKey}_${safeCustom}_${processTimestamp}`
+                            : `${groupData.fileKey}_${processTimestamp}`;
 
                         splitGroups.push({
-                            key,
+                            key: groupData.displayKey,
+                            keyParts: groupData.keyParts,
+                            fileKey: groupData.fileKey,
                             filename: filenameBase,
-                            rows: [headerRow, ...rows],
-                            count: rows.length
+                            rows: [headerRow, ...groupData.rows],
+                            count: groupData.rows.length
                         });
 
-                        totalRowsProcessed += rows.length;
+                        totalRowsProcessed += groupData.rows.length;
                     }
 
-                    // Sort groups naturally by key
+                    // Sort groups hierarchically by the column hierarchy (order)
                     splitGroups.sort((a, b) => {
-                        const numA = parseFloat(a.key);
-                        const numB = parseFloat(b.key);
-                        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                        return String(a.key).localeCompare(String(b.key));
+                        for (let i = 0; i < a.keyParts.length; i++) {
+                            const partA = a.keyParts[i] || '';
+                            const partB = b.keyParts[i] || '';
+                            const numA = parseFloat(partA);
+                            const numB = parseFloat(partB);
+                            const isNumA = !isNaN(numA) && String(numA) === partA.trim();
+                            const isNumB = !isNaN(numB) && String(numB) === partB.trim();
+
+                            if (isNumA && isNumB) {
+                                if (numA !== numB) return numA - numB;
+                            } else {
+                                const cmp = partA.localeCompare(partB, 'id', { numeric: true, sensitivity: 'base' });
+                                if (cmp !== 0) return cmp;
+                            }
+                        }
+                        return 0;
                     });
 
                     splitReady = true;
@@ -2637,7 +3052,7 @@
                     splitResultSection.style.display = 'block';
                     updateSplitUI();
 
-                    showToast(`Berhasil memisahkan data menjadi ${splitGroups.length} file!`, 'success');
+                    showToast(`Berhasil memisahkan data menjadi ${splitGroups.length} file dengan tipe teks murni!`, 'success');
                     splitResultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                 } catch (err) {
@@ -2656,7 +3071,8 @@
             const query = filter.toLowerCase().trim();
             const filtered = splitGroups.filter(g =>
                 g.key.toLowerCase().includes(query) ||
-                g.filename.toLowerCase().includes(query)
+                g.filename.toLowerCase().includes(query) ||
+                (g.keyParts && g.keyParts.some(p => p.toLowerCase().includes(query)))
             );
 
             if (filtered.length === 0) {
@@ -2670,35 +3086,43 @@
                 return;
             }
 
-            splitResultsTableBody.innerHTML = filtered.map((g, idx) => `
-                <tr>
-                    <td style="color:var(--text-muted); font-size:11px;">${idx + 1}</td>
-                    <td>
-                        <span class="badge-split-key">${escapeHtml(g.key)}</span>
-                    </td>
-                    <td style="font-family:'Consolas', monospace; font-size:12.5px; color:var(--text-primary);">
-                        ${escapeHtml(g.filename)}.xlsx
-                    </td>
-                    <td>
-                        <span style="font-weight:600; color:var(--text-secondary);">${g.count}</span> baris
-                    </td>
-                    <td style="text-align:right;">
-                        <button class="split-action-btn ${selectedSplitPreviewKey === g.key ? 'active' : ''}"
-                            onclick="previewSplitGroup('${escapeHtml(g.key)}')" title="Lihat pratinjau data">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            Pratinjau
-                        </button>
-                        <button class="split-action-btn" onclick="downloadSingleSplitXLSX('${escapeHtml(g.key)}')" title="Unduh XLSX">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            .XLSX
-                        </button>
-                        <button class="split-action-btn" onclick="downloadSingleSplitCSV('${escapeHtml(g.key)}')" title="Unduh CSV">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            .CSV
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            splitResultsTableBody.innerHTML = filtered.map((g, idx) => {
+                const badgesHtml = g.keyParts && g.keyParts.length > 0
+                    ? g.keyParts.map((p, pIdx) => `<span class="badge-split-key" title="Acuan #${pIdx + 1}">${escapeHtml(p)}</span>`).join(' <span style="color:var(--text-muted); font-size:11px; margin:0 2px;">/</span> ')
+                    : `<span class="badge-split-key">${escapeHtml(g.key)}</span>`;
+
+                return `
+                    <tr>
+                        <td style="color:var(--text-muted); font-size:11px;">${idx + 1}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+                                ${badgesHtml}
+                            </div>
+                        </td>
+                        <td style="font-family:'Consolas', monospace; font-size:12.5px; color:var(--text-primary);">
+                            ${escapeHtml(g.filename)}.xlsx
+                        </td>
+                        <td>
+                            <span style="font-weight:600; color:var(--text-secondary);">${g.count}</span> baris
+                        </td>
+                        <td style="text-align:right;">
+                            <button class="split-action-btn ${selectedSplitPreviewKey === g.key ? 'active' : ''}"
+                                onclick="previewSplitGroupByIdx(${idx})" title="Lihat pratinjau data">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Pratinjau
+                            </button>
+                            <button class="split-action-btn" onclick="downloadSingleSplitXLSXByIdx(${idx})" title="Unduh XLSX (Tipe Teks)">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                .XLSX
+                            </button>
+                            <button class="split-action-btn" onclick="downloadSingleSplitCSVByIdx(${idx})" title="Unduh CSV">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                .CSV
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function filterSplitTable() {
@@ -2706,13 +3130,29 @@
             renderSplitResultsTable(val);
         }
 
+        function getFilteredGroup(idx) {
+            const query = (document.getElementById('splitFilterInput')?.value || '').toLowerCase().trim();
+            const filtered = splitGroups.filter(g =>
+                g.key.toLowerCase().includes(query) ||
+                g.filename.toLowerCase().includes(query) ||
+                (g.keyParts && g.keyParts.some(p => p.toLowerCase().includes(query)))
+            );
+            return filtered[idx];
+        }
+
         // ─── Preview Group Detail ────────────────────────────────────
+        function previewSplitGroupByIdx(idx) {
+            const group = getFilteredGroup(idx);
+            if (!group) return;
+            previewSplitGroup(group.key);
+        }
+
         function previewSplitGroup(key) {
             const group = splitGroups.find(g => g.key === key);
             if (!group) return;
 
             selectedSplitPreviewKey = key;
-            renderSplitResultsTable(document.getElementById('splitFilterInput').value);
+            renderSplitResultsTable(document.getElementById('splitFilterInput')?.value || '');
 
             splitDetailGroupName.textContent = `${group.filename}.xlsx (${group.count} baris)`;
 
@@ -2750,7 +3190,12 @@
             splitGroupDetailSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // ─── Download Single Split File ──────────────────────────────
+        // ─── Download Single Split File (XLSX - Pure Text) ───────────
+        function downloadSingleSplitXLSXByIdx(idx) {
+            const group = getFilteredGroup(idx);
+            if (group) downloadSingleSplitXLSX(group.key);
+        }
+
         function downloadSingleSplitXLSX(key, showAnim = true) {
             const group = splitGroups.find(g => g.key === key);
             if (!group) return;
@@ -2758,24 +3203,14 @@
             if (showAnim) {
                 showDownloadModal(
                     'Menyiapkan File Excel (.xlsx)',
-                    `Sedang menyusun data untuk "${group.filename}.xlsx"...`,
+                    `Sedang menyusun data untuk "${group.filename}.xlsx" (format teks murni)...`,
                     'indeterminate'
                 );
             }
 
             setTimeout(() => {
                 try {
-                    const ws = XLSX.utils.aoa_to_sheet(group.rows);
-                    const colWidths = group.rows[0].map((_, colIdx) => {
-                        let maxLen = 10;
-                        group.rows.forEach(row => {
-                            const val = String(row[colIdx] || '');
-                            if (val.length > maxLen) maxLen = val.length;
-                        });
-                        return { wch: Math.min(maxLen + 2, 40) };
-                    });
-                    ws['!cols'] = colWidths;
-
+                    const ws = createTextSheet(group.rows);
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Data');
                     XLSX.writeFile(wb, `${group.filename}.xlsx`);
@@ -2790,6 +3225,11 @@
                     }
                 }
             }, showAnim ? 80 : 0);
+        }
+
+        function downloadSingleSplitCSVByIdx(idx) {
+            const group = getFilteredGroup(idx);
+            if (group) downloadSingleSplitCSV(group.key);
         }
 
         function downloadSingleSplitCSV(key, showAnim = true) {
@@ -2838,8 +3278,9 @@
             }, showAnim ? 80 : 0);
         }
 
-        // ─── Download All Split as ZIP ───────────────────────────────
-        function downloadAllSplitZip() {
+        // ─── Download All Split as ZIP (All Pure Text) ───────────────
+        // ─── Download All Split as ZIP (Asynchronous & Non-Blocking) ─
+        async function downloadAllSplitZip() {
             if (!splitReady || splitGroups.length === 0) return;
 
             if (typeof JSZip === 'undefined') {
@@ -2849,71 +3290,83 @@
 
             const zipBtn = document.getElementById('btnDownloadZip');
             zipBtn.disabled = true;
-            zipBtn.innerHTML = '<span class="spinner"></span> Membuat ZIP...';
+            zipBtn.innerHTML = '<span class="spinner"></span> Menyiapkan ZIP...';
 
-            showDownloadModal(
+            const total = splitGroups.length;
+            showProcessModal(
+                'download',
                 'Mengemas File ZIP (.zip)',
-                `Sedang menyusun ${splitGroups.length} file Excel hasil pecahan...`,
+                `Sedang menyusun ${total} file Excel pecahan (tipe teks murni)...`,
                 'determinate'
             );
 
-            setTimeout(() => {
-                try {
-                    const zip = new JSZip();
+            // Yield once so the modal and spinner can render smoothly
+            await new Promise(r => setTimeout(r, 60));
 
-                    splitGroups.forEach(group => {
-                        const ws = XLSX.utils.aoa_to_sheet(group.rows);
-                        const colWidths = group.rows[0].map((_, colIdx) => {
-                            let maxLen = 10;
-                            group.rows.forEach(row => {
-                                const val = String(row[colIdx] || '');
-                                if (val.length > maxLen) maxLen = val.length;
-                            });
-                            return { wch: Math.min(maxLen + 2, 40) };
-                        });
-                        ws['!cols'] = colWidths;
-                        const wb = XLSX.utils.book_new();
-                        XLSX.utils.book_append_sheet(wb, ws, 'Data');
-                        const xlsxArray = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                        zip.file(`${group.filename}.xlsx`, xlsxArray);
-                    });
+            try {
+                const zip = new JSZip();
 
-                    updateDownloadModalProgress(20, 'Mengompresi seluruh file ke format ZIP...');
+                // Process files asynchronously in chunks to prevent blocking the main thread
+                for (let i = 0; i < total; i++) {
+                    const group = splitGroups[i];
+                    const ws = createTextSheet(group.rows);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Data');
+                    const xlsxArray = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    zip.file(`${group.filename}.xlsx`, xlsxArray);
 
-                    zip.generateAsync({ type: 'blob' }, metadata => {
-                        const pct = 20 + (metadata.percent * 0.8);
-                        updateDownloadModalProgress(pct, `Mengompresi ZIP: ${Math.round(metadata.percent)}%`);
-                    }).then(blob => {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `split_excel_hasil_${getTimestamp()}.zip`;
-                        a.click();
-                        URL.revokeObjectURL(url);
+                    // Update live progress (0% - 65% for creating files)
+                    const filePct = Math.round(((i + 1) / total) * 65);
+                    updateProcessModalProgress(
+                        filePct,
+                        `Menyusun berkas (${i + 1}/${total}): ${group.filename}.xlsx`
+                    );
 
-                        showToast(`Semua file (${splitGroups.length} file) berhasil diunduh dalam ZIP!`, 'success');
-                        document.getElementById('splitStep3').className = 'step done';
-                    }).catch(err => {
-                        showToast('Gagal membuat file ZIP: ' + err.message, 'error');
-                    }).finally(() => {
-                        zipBtn.disabled = false;
-                        zipBtn.innerHTML = `
-                            <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                            Unduh Semua (.ZIP XLSX)
-                        `;
-                        hideDownloadModal(600);
-                    });
-
-                } catch (err) {
-                    showToast('Gagal memproses ZIP: ' + err.message, 'error');
-                    zipBtn.disabled = false;
-                    zipBtn.innerHTML = `
-                        <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                        Unduh Semua (.ZIP XLSX)
-                    `;
-                    hideDownloadModal(300);
+                    // Yield to the browser event loop every file
+                    // This guarantees zero UI freezes and no "Page Unresponsive" dialog!
+                    await new Promise(r => setTimeout(r, 0));
                 }
-            }, 100);
+
+                updateProcessModalProgress(65, 'Mengompresi seluruh file ke format ZIP...');
+                await new Promise(r => setTimeout(r, 30));
+
+                // Use compression level 1 for optimal speed since .xlsx is already internally zipped OpenXML
+                const blob = await zip.generateAsync(
+                    {
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: { level: 1 }
+                    },
+                    metadata => {
+                        const zipPct = 65 + Math.round(metadata.percent * 0.35);
+                        updateProcessModalProgress(
+                            zipPct,
+                            `Mengompresi ZIP: ${Math.round(metadata.percent)}%`
+                        );
+                    }
+                );
+
+                updateProcessModalProgress(100, 'Selesai! Memulai unduhan...');
+
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `split_excel_hasil_${getTimestamp()}.zip`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                showToast(`Semua file (${total} file) berhasil diunduh dalam ZIP!`, 'success');
+                document.getElementById('splitStep3').className = 'step done';
+            } catch (err) {
+                showToast('Gagal memproses ZIP: ' + err.message, 'error');
+            } finally {
+                zipBtn.disabled = false;
+                zipBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                    Unduh Semua (.ZIP XLSX)
+                `;
+                hideProcessModal(600);
+            }
         }
 
         // ─── Download All Individual Sequentially ─────────────────────
