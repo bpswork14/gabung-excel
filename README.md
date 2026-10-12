@@ -12,6 +12,10 @@ Aplikasi web modern berbasis client-side untuk mengolah data file Excel (.xlsx, 
 - Pemetaan kolom otomatis jika urutan kolom pada file berikutnya berbeda.
 - Opsi pengurutan data (*sorting*) berdasarkan kolom yang dipilih.
 - Pratinjau (*preview*) data hasil gabungan sebelum diunduh.
+- **Edit Nama Hasil Unduhan**:
+  - Kolom input nama file hasil gabungan yang dapat disesuaikan sesuka hati.
+  - Opsi toggle sertakan/hilangkan *timestamp* (tanggal & jam).
+  - *Live preview* nama file output real-time untuk unduhan `.xlsx` maupun `.csv`.
 - Unduh hasil dalam format `.xlsx` atau `.csv`.
 
 ### 2. Split Excel (Fitur Canggih & Fleksibel 🚀)
@@ -19,18 +23,23 @@ Aplikasi web modern berbasis client-side untuk mengolah data file Excel (.xlsx, 
   - Dapat memisahkan file berdasarkan **1 atau lebih kolom acuan**.
   - Dilengkapi tombol geser urutan (▲ / ▼) untuk mengatur prioritas pemisahan (*hierarchical grouping*) dan susunan nama file output.
   - Setiap kolom acuan memiliki konfigurasi aturan karakter independen.
+- **Pengaturan Posisi Nama Referensi Sesuai Kemauan Pengguna**:
+  - **Di Awal (Depan)**: `[Referensi]_[Nama Kustom]_[Waktu].xlsx` (contoh: `3201_rekap_kecamatan_20261012.xlsx`).
+  - **Di Akhir (Belakang)**: `[Nama Kustom]_[Referensi]_[Waktu].xlsx` (contoh: `rekap_kecamatan_3201_20261012.xlsx`).
+  - **Pola Format Kustom Bebas**: Susun pola nama file secara fleksibel menggunakan tag placeholder `{ref}`, `{custom}`, `{timestamp}`, `{date}` (contoh: `{custom}-{ref}`, `Laporan_{ref}_{date}`, dll.).
+  - Opsi toggle *timestamp* (tanggal & jam) untuk hasil nama file yang bersih dan ringkas.
+  - *Live preview* nama file dan penjelasan format secara *real-time*.
+- **Edit Nama File Hasil Satuan di Tabel**:
+  - Tombol edit pensil pada setiap baris hasil split untuk mengubah nama file output individual secara langsung (*inline edit*) sebelum diunduh.
+  - File ZIP maupun unduhan satuan otomatis mengikuti nama file yang telah diedit.
 - **Tipe Data Output Teks Murni (Anti Notasi E 🛡️)**:
   - Seluruh kolom dan sel pada file output (.xlsx) diatur bertipe **teks murni (`text format` `@`)**.
   - Menjamin angka berdigit panjang (seperti NIK 16 digit, nomor KK, nomor telepon/HP, ID pelanggan, barcode) **tidak berubah menjadi notasi ilmiah `E`** (misal `3.201E+15`) dan angka 0 di depan tetap aman terjaga.
 - **Fleksibilitas Pemotongan Karakter**:
   - Ambil sejumlah digit/karakter dari kiri (contoh: 2 digit kode provinsi, 4 digit kode kecamatan).
   - Atau gunakan seluruh isi kolom tanpa pemotongan.
-- **Nama File Output Kustom & Berurutan**:
-  - Format penamaan mengikuti urutan kolom: `[ref_kolom_1]_[ref_kolom_2]_[inputan user]_[timestamp].xlsx`
-  - Contoh: `32_01_rekap_kecamatan_20261010_092500.xlsx`
-  - Dilengkapi *live preview* nama file dan pola format secara real-time saat mengetik.
 - **Opsi Unduhan Fleksibel**:
-  - **Unduh Semua (.ZIP)**: Satu kali klik untuk mengunduh seluruh file hasil split dalam arsip ZIP. Menggunakan pemrosesan *asynchronous chunking* non-blocking sehingga browser tidak akan membeku (*unresponsive*) bahkan saat memproses ratusan file sekaligus.
+  - **Unduh Semua (.ZIP)**: Satu kali klik untuk mengunduh seluruh file hasil split dalam arsip ZIP dengan nama kustom. Menggunakan pemrosesan *asynchronous chunking* non-blocking sehingga browser tidak akan membeku (*unresponsive*) bahkan saat memproses ratusan file sekaligus.
   - **Unduh Satu per Satu**: Unduh file individual langsung dari tabel hasil (.xlsx atau .csv).
   - **Pratinjau Data**: Lihat data isi baris untuk masing-masing grup split sebelum mengunduh.
 

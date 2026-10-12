@@ -1600,6 +1600,40 @@
                     </div>
                 </div>
                 <div class="table-wrapper" id="tableWrapper"></div>
+
+                <!-- Konfigurasi Nama File Hasil Unduhan Gabung -->
+                <div class="config-card" style="margin-top:20px; padding:20px 22px; gap:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <label class="form-label" for="mergeCustomName" style="font-size:14px; font-weight:700; margin-bottom:0;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                            Edit Nama File Hasil Unduhan
+                        </label>
+                        <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-secondary); cursor:pointer; user-select:none;">
+                            <input type="checkbox" id="mergeIncludeTimestamp" checked onchange="updateMergeFilenamePreview()" style="cursor:pointer; accent-color:var(--accent); width:15px; height:15px;">
+                            Sertakan Tanggal & Jam (Timestamp)
+                        </label>
+                    </div>
+                    <div>
+                        <input type="text" id="mergeCustomName" class="form-control"
+                            value="hasil_gabungan" placeholder="Contoh: hasil_gabungan / rekap_data_final" oninput="updateMergeFilenamePreview()">
+                    </div>
+                    <div class="preview-box" style="margin-top:2px;">
+                        <div class="preview-box-header">
+                            <span>Pratinjau Nama File Output (.xlsx & .csv)</span>
+                            <span id="mergeFilenamePatternHint">[nama_file]_[timestamp]</span>
+                        </div>
+                        <div class="preview-box-content" id="mergeFilenamePreview" style="color:var(--success); border-color:rgba(52,211,153,0.3); background:rgba(52,211,153,0.06);">
+                            hasil_gabungan_20261012_102000.xlsx
+                        </div>
+                        <div class="preview-box-sub">
+                            Nama file di atas akan otomatis digunakan saat Anda mengunduh format XLSX maupun CSV.
+                        </div>
+                    </div>
+                </div>
+
                 <div class="actions" style="margin-top:20px;">
                     <button class="btn btn-success" onclick="downloadResult()">
                         <svg viewBox="0 0 24 24">
@@ -1747,6 +1781,57 @@
                     <input type="text" id="splitCustomName" class="form-control"
                         placeholder="Contoh: rekap_kecamatan / laporan_kabupaten" oninput="onSplitConfigChange()">
                     <div class="form-hint">Teks tambahan opsional yang disematkan ke dalam nama file pecahan.</div>
+                </div>
+
+                <!-- Konfigurasi Format & Posisi Nama Referensi -->
+                <div class="form-group" style="margin-top:2px;">
+                    <label class="form-label">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="9" x2="20" y2="9" />
+                            <line x1="4" y1="15" x2="20" y2="15" />
+                            <rect x="2" y="3" width="20" height="18" rx="2" />
+                        </svg>
+                        Posisi Nama Referensi pada Nama File
+                    </label>
+                    <div class="segmented-options" id="splitRefPositionOptions">
+                        <div class="segmented-option active" id="optRefPrefix" onclick="setSplitRefPosition('prefix')">
+                            Di Awal (Depan)
+                        </div>
+                        <div class="segmented-option" id="optRefSuffix" onclick="setSplitRefPosition('suffix')">
+                            Di Akhir (Belakang)
+                        </div>
+                        <div class="segmented-option" id="optRefCustom" onclick="setSplitRefPosition('custom')">
+                            Pola Format Kustom
+                        </div>
+                    </div>
+                    <div class="form-hint">
+                        Atur letak nama referensi kolom: di awal nama file, di akhir setelah teks kustom, atau susun format pola bebas.
+                    </div>
+                </div>
+
+                <!-- Template Pola Kustom (Hanya muncul jika mode 'custom') -->
+                <div class="form-group" id="splitCustomPatternGroup" style="display:none; margin-top:2px;">
+                    <label class="form-label" for="splitCustomPattern">
+                        Pola Format Penamaan Kustom
+                    </label>
+                    <input type="text" id="splitCustomPattern" class="form-control"
+                        value="{custom}_{ref}_{timestamp}" placeholder="{custom}_{ref}_{timestamp}" oninput="onSplitConfigChange()">
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:4px;">
+                        <span style="font-size:11.5px; color:var(--text-muted);">Klik tag untuk menyisipkan:</span>
+                        <button type="button" class="rule-btn" onclick="insertPatternTag('{ref}')" style="width:auto; padding:3px 8px; font-size:11.5px;" title="Nilai referensi kolom (contoh: 3201)">+{ref}</button>
+                        <button type="button" class="rule-btn" onclick="insertPatternTag('{custom}')" style="width:auto; padding:3px 8px; font-size:11.5px;" title="Teks input nama kustom">+{custom}</button>
+                        <button type="button" class="rule-btn" onclick="insertPatternTag('{timestamp}')" style="width:auto; padding:3px 8px; font-size:11.5px;" title="Waktu lengkap YYYYMMDD_HHMMSS">+{timestamp}</button>
+                        <button type="button" class="rule-btn" onclick="insertPatternTag('{date}')" style="width:auto; padding:3px 8px; font-size:11.5px;" title="Tanggal saja YYYYMMDD">+{date}</button>
+                    </div>
+                </div>
+
+                <!-- Checkbox Timestamp Split -->
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="splitIncludeTimestamp" checked onchange="onSplitConfigChange()"
+                        style="cursor:pointer; accent-color:var(--accent); width:15px; height:15px;">
+                    <label for="splitIncludeTimestamp" style="font-size:13px; color:var(--text-secondary); cursor:pointer; user-select:none;">
+                        Sertakan Tanggal & Jam (Timestamp) pada Nama File
+                    </label>
                 </div>
 
                 <!-- Live Filename Preview Box -->
@@ -2301,6 +2386,7 @@
 
                     mergedReady = true;
                     renderPreview();
+                    updateMergeFilenamePreview();
                     previewSection.style.display = 'block';
                     lockUpload();
                     updateUI();
@@ -2319,6 +2405,30 @@
                     `;
                 }
             }, 100);
+        }
+
+        function getMergeBaseFilename() {
+            const rawName = (document.getElementById('mergeCustomName')?.value || '').trim();
+            const safeName = sanitizeForFilename(rawName) || 'hasil_gabungan';
+            const includeTs = document.getElementById('mergeIncludeTimestamp')?.checked !== false;
+            const ts = includeTs ? `_${getTimestamp()}` : '';
+            return `${safeName}${ts}`;
+        }
+
+        function updateMergeFilenamePreview() {
+            const rawName = (document.getElementById('mergeCustomName')?.value || '').trim();
+            const safeName = sanitizeForFilename(rawName) || 'hasil_gabungan';
+            const includeTs = document.getElementById('mergeIncludeTimestamp')?.checked !== false;
+            const sampleTs = getTimestamp();
+            const previewEl = document.getElementById('mergeFilenamePreview');
+            const hintEl = document.getElementById('mergeFilenamePatternHint');
+
+            if (hintEl) {
+                hintEl.textContent = includeTs ? '[nama_file]_[timestamp]' : '[nama_file]';
+            }
+            if (previewEl) {
+                previewEl.textContent = `${safeName}${includeTs ? `_${sampleTs}` : ''}.xlsx`;
+            }
         }
 
         function renderPreview() {
@@ -2360,9 +2470,12 @@
         function downloadResult() {
             if (!mergedReady || mergedData.length === 0) return;
 
+            const outBase = getMergeBaseFilename();
+            const outFilename = `${outBase}.xlsx`;
+
             showDownloadModal(
                 'Menyiapkan File Excel (.xlsx)',
-                `Sedang menyusun dan merapikan ${mergedData.length - 1} baris data gabungan...`,
+                `Sedang menyusun dan merapikan "${outFilename}"...`,
                 'indeterminate'
             );
 
@@ -2372,9 +2485,9 @@
 
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Gabungan');
-                    XLSX.writeFile(wb, `hasil_gabungan_${getTimestamp()}.xlsx`);
+                    XLSX.writeFile(wb, outFilename);
 
-                    showToast('File XLSX berhasil diunduh!', 'success');
+                    showToast(`File "${outFilename}" berhasil diunduh!`, 'success');
                     document.getElementById('step3').className = 'step done';
                 } catch (err) {
                     showToast('Gagal mengunduh XLSX: ' + err.message, 'error');
@@ -2387,9 +2500,12 @@
         function downloadCSV() {
             if (!mergedReady || mergedData.length === 0) return;
 
+            const outBase = getMergeBaseFilename();
+            const outFilename = `${outBase}.csv`;
+
             showDownloadModal(
                 'Menyiapkan File CSV (.csv)',
-                `Sedang mengekspor ${mergedData.length - 1} baris data ke format CSV...`,
+                `Sedang mengekspor "${outFilename}" ke format CSV...`,
                 'indeterminate'
             );
 
@@ -2411,11 +2527,11 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `hasil_gabungan_${getTimestamp()}.csv`;
+                    a.download = outFilename;
                     a.click();
                     URL.revokeObjectURL(url);
 
-                    showToast('File CSV berhasil diunduh!', 'success');
+                    showToast(`File "${outFilename}" berhasil diunduh!`, 'success');
                     document.getElementById('step3').className = 'step done';
                 } catch (err) {
                     showToast('Gagal mengunduh CSV: ' + err.message, 'error');
@@ -2583,6 +2699,7 @@
             splitConfigs = [];
             splitGroups = [];
             splitReady = false;
+            editingSplitKey = null;
             splitResultSection.style.display = 'none';
             splitGroupDetailSection.style.display = 'none';
             dropZoneSplit.classList.remove('disabled');
@@ -2808,6 +2925,91 @@
             return letter;
         }
 
+        let splitRefPosition = 'prefix'; // 'prefix' | 'suffix' | 'custom'
+        let editingSplitKey = null;
+
+        function setSplitRefPosition(pos) {
+            splitRefPosition = pos;
+            document.getElementById('optRefPrefix')?.classList.toggle('active', pos === 'prefix');
+            document.getElementById('optRefSuffix')?.classList.toggle('active', pos === 'suffix');
+            document.getElementById('optRefCustom')?.classList.toggle('active', pos === 'custom');
+
+            const customGroup = document.getElementById('splitCustomPatternGroup');
+            if (customGroup) {
+                customGroup.style.display = pos === 'custom' ? 'block' : 'none';
+            }
+            onSplitConfigChange();
+        }
+
+        function insertPatternTag(tag) {
+            const input = document.getElementById('splitCustomPattern');
+            if (!input) return;
+            const start = input.selectionStart || input.value.length;
+            const end = input.selectionEnd || input.value.length;
+            const currentVal = input.value;
+            input.value = currentVal.substring(0, start) + tag + currentVal.substring(end);
+            input.focus();
+            input.setSelectionRange(start + tag.length, start + tag.length);
+            onSplitConfigChange();
+        }
+
+        function generateSplitFilename(refKey, customName, timestamp, dateStr) {
+            const includeTs = document.getElementById('splitIncludeTimestamp')?.checked !== false;
+            let filename = '';
+            let patternHint = '';
+
+            if (splitRefPosition === 'prefix') {
+                const parts = [];
+                const hintParts = [];
+                if (refKey) {
+                    parts.push(refKey);
+                    hintParts.push('[referensi]');
+                }
+                if (customName) {
+                    parts.push(customName);
+                    hintParts.push('[nama_kustom]');
+                }
+                if (includeTs && timestamp) {
+                    parts.push(timestamp);
+                    hintParts.push('[timestamp]');
+                }
+                filename = parts.join('_') || 'split_file';
+                patternHint = (hintParts.join('_') || '[referensi]') + '.xlsx';
+            } else if (splitRefPosition === 'suffix') {
+                const parts = [];
+                const hintParts = [];
+                if (customName) {
+                    parts.push(customName);
+                    hintParts.push('[nama_kustom]');
+                }
+                if (refKey) {
+                    parts.push(refKey);
+                    hintParts.push('[referensi]');
+                }
+                if (includeTs && timestamp) {
+                    parts.push(timestamp);
+                    hintParts.push('[timestamp]');
+                }
+                filename = parts.join('_') || 'split_file';
+                patternHint = (hintParts.join('_') || '[referensi]') + '.xlsx';
+            } else { // 'custom'
+                let pattern = (document.getElementById('splitCustomPattern')?.value || '{custom}_{ref}_{timestamp}').trim();
+                patternHint = pattern + '.xlsx';
+
+                let res = pattern
+                    .replace(/\{ref\}/gi, refKey || '')
+                    .replace(/\{custom\}/gi, customName || '')
+                    .replace(/\{timestamp\}/gi, includeTs && timestamp ? timestamp : '')
+                    .replace(/\{date\}/gi, dateStr || '');
+
+                res = sanitizeForFilename(res);
+                res = res.replace(/^_+|_+$/g, '');
+                filename = res || (refKey ? refKey : 'split_file');
+            }
+
+            return { filename, patternHint };
+        }
+
         function onSplitConfigChange() {
             if (splitRefColumns.length === 0 || splitUploadedFiles.length === 0 || splitConfigs.length === 0) return;
 
@@ -2854,16 +3056,12 @@
             const rawCustom = (splitCustomName.value || '').trim();
             const safeCustom = sanitizeForFilename(rawCustom);
             const sampleTimestamp = getTimestamp();
-
+            const sampleDate = sampleTimestamp.split('_')[0];
             const combinedKey = sampleParts.join('_');
-            const patternHintStr = patternParts.join('_') + (safeCustom ? `_${safeCustom}` : '') + `_[timestamp].xlsx`;
 
-            let previewName = '';
-            if (safeCustom) {
-                previewName = `${combinedKey}_${safeCustom}_${sampleTimestamp}.xlsx`;
-            } else {
-                previewName = `${combinedKey}_${sampleTimestamp}.xlsx`;
-            }
+            const fileNaming = generateSplitFilename(combinedKey, safeCustom, sampleTimestamp, sampleDate);
+            const previewName = `${fileNaming.filename}.xlsx`;
+            const patternHintStr = fileNaming.patternHint;
 
             if (splitFilenamePatternHint) {
                 splitFilenamePatternHint.textContent = patternHintStr;
@@ -2872,7 +3070,15 @@
                 splitFilenamePreview.textContent = previewName;
             }
             if (splitPreviewExplanation) {
-                splitPreviewExplanation.innerHTML = `Urutan pemisahan (${splitConfigs.length} kolom): <strong>${explanationParts.join(' &rarr; ')}</strong>. <span style="color:#34d399; font-weight:600;">Semua kolom output berformat teks murni (bebas notasi E).</span>`;
+                let posExplanation = '';
+                if (splitRefPosition === 'prefix') {
+                    posExplanation = 'Posisi: Referensi kolom di <strong>Awal (Depan)</strong>.';
+                } else if (splitRefPosition === 'suffix') {
+                    posExplanation = 'Posisi: Referensi kolom di <strong>Akhir (Belakang)</strong>.';
+                } else {
+                    posExplanation = 'Posisi: Mengikuti <strong>Pola Format Kustom</strong>.';
+                }
+                splitPreviewExplanation.innerHTML = `Urutan pemisahan (${splitConfigs.length} kolom): <strong>${explanationParts.join(' &rarr; ')}</strong>.<br>${posExplanation} <span style="color:#34d399; font-weight:600;">Semua kolom output berformat teks murni (bebas notasi E).</span>`;
             }
         }
 
@@ -2938,6 +3144,7 @@
                     const rawCustom = (splitCustomName.value || '').trim();
                     const safeCustom = sanitizeForFilename(rawCustom);
                     const processTimestamp = getTimestamp();
+                    const processDate = processTimestamp.split('_')[0];
 
                     // Structure follows file 1 (splitRefColumns)
                     const headerRow = splitRefColumns.slice();
@@ -3003,9 +3210,8 @@
                     let totalRowsProcessed = 0;
 
                     for (const groupData of groupsMap.values()) {
-                        let filenameBase = safeCustom
-                            ? `${groupData.fileKey}_${safeCustom}_${processTimestamp}`
-                            : `${groupData.fileKey}_${processTimestamp}`;
+                        const fileNaming = generateSplitFilename(groupData.fileKey, safeCustom, processTimestamp, processDate);
+                        const filenameBase = fileNaming.filename;
 
                         splitGroups.push({
                             key: groupData.displayKey,
@@ -3040,6 +3246,7 @@
                     });
 
                     splitReady = true;
+                    editingSplitKey = null;
                     dropZoneSplit.classList.add('disabled');
                     fileInputSplit.disabled = true;
 
@@ -3091,6 +3298,39 @@
                     ? g.keyParts.map((p, pIdx) => `<span class="badge-split-key" title="Acuan #${pIdx + 1}">${escapeHtml(p)}</span>`).join(' <span style="color:var(--text-muted); font-size:11px; margin:0 2px;">/</span> ')
                     : `<span class="badge-split-key">${escapeHtml(g.key)}</span>`;
 
+                const isEditing = editingSplitKey === g.key;
+
+                let filenameColHtml = '';
+                if (isEditing) {
+                    filenameColHtml = `
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <input type="text" id="inlineEditFilenameInput" class="form-control"
+                                value="${escapeHtml(g.filename)}"
+                                style="padding:5px 8px; font-size:12px; font-family:'Consolas',monospace; max-width:240px;"
+                                onkeydown="if(event.key==='Enter') saveSplitFilename(${idx}); if(event.key==='Escape') cancelEditSplitFilename();">
+                            <span style="color:var(--text-muted); font-size:11px; font-family:'Consolas',monospace;">.xlsx</span>
+                            <button class="rule-btn" onclick="saveSplitFilename(${idx})" title="Simpan Nama" style="color:var(--success); border-color:var(--success); width:28px; height:28px; padding:0;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            </button>
+                            <button class="rule-btn danger" onclick="cancelEditSplitFilename()" title="Batal" style="width:28px; height:28px; padding:0;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    filenameColHtml = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-family:'Consolas', monospace; font-size:12.5px; color:var(--text-primary);">${escapeHtml(g.filename)}.xlsx</span>
+                            <button class="rule-btn" onclick="startEditSplitFilename(${idx})" title="Edit nama file output ini" style="width:24px; height:24px; padding:2px; opacity:0.75;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.75'">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                }
+
                 return `
                     <tr>
                         <td style="color:var(--text-muted); font-size:11px;">${idx + 1}</td>
@@ -3099,8 +3339,8 @@
                                 ${badgesHtml}
                             </div>
                         </td>
-                        <td style="font-family:'Consolas', monospace; font-size:12.5px; color:var(--text-primary);">
-                            ${escapeHtml(g.filename)}.xlsx
+                        <td>
+                            ${filenameColHtml}
                         </td>
                         <td>
                             <span style="font-weight:600; color:var(--text-secondary);">${g.count}</span> baris
@@ -3123,6 +3363,45 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        function startEditSplitFilename(idx) {
+            const group = getFilteredGroup(idx);
+            if (!group) return;
+            editingSplitKey = group.key;
+            const filterVal = document.getElementById('splitFilterInput')?.value || '';
+            renderSplitResultsTable(filterVal);
+            const input = document.getElementById('inlineEditFilenameInput');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }
+
+        function saveSplitFilename(idx) {
+            const group = getFilteredGroup(idx);
+            if (!group) return;
+            const input = document.getElementById('inlineEditFilenameInput');
+            if (!input) return;
+            const newName = sanitizeForFilename(input.value.trim());
+            if (!newName) {
+                showToast('Nama file tidak boleh kosong.', 'error');
+                return;
+            }
+            group.filename = newName;
+            showToast(`Nama file diperbarui menjadi: ${newName}.xlsx`, 'success');
+            if (selectedSplitPreviewKey === group.key) {
+                splitDetailGroupName.textContent = `${group.filename}.xlsx (${group.count} baris)`;
+            }
+            editingSplitKey = null;
+            const filterVal = document.getElementById('splitFilterInput')?.value || '';
+            renderSplitResultsTable(filterVal);
+        }
+
+        function cancelEditSplitFilename() {
+            editingSplitKey = null;
+            const filterVal = document.getElementById('splitFilterInput')?.value || '';
+            renderSplitResultsTable(filterVal);
         }
 
         function filterSplitTable() {
@@ -3351,7 +3630,10 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `split_excel_hasil_${getTimestamp()}.zip`;
+                const rawCustom = (splitCustomName.value || '').trim();
+                const safeCustom = sanitizeForFilename(rawCustom);
+                const zipBase = safeCustom ? `${safeCustom}_split_${getTimestamp()}` : `split_excel_hasil_${getTimestamp()}`;
+                a.download = `${zipBase}.zip`;
                 a.click();
                 URL.revokeObjectURL(url);
 
