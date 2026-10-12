@@ -1743,6 +1743,73 @@
                     </span>
                 </div>
 
+                <!-- Pengaturan Baris Header & Baris Mulai Data -->
+                <div class="split-rules-container" id="splitRowConfigContainer">
+                    <div class="split-rules-header">
+                        <div>
+                            <span class="split-rules-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="3" y1="6" x2="21" y2="6"/>
+                                    <line x1="3" y1="12" x2="21" y2="12"/>
+                                    <line x1="3" y1="18" x2="21" y2="18"/>
+                                    <rect x="2" y="3" width="20" height="18" rx="2"/>
+                                </svg>
+                                Pengaturan Baris Data & Header Kolom
+                            </span>
+                            <div class="form-hint" style="margin-top:2px;">
+                                Tentukan nomor baris header (nama kolom) dan baris awal dimulainya data isi (berguna jika file diawali judul laporan pada baris 1 atau 2).
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSplitRowPreview()" id="btnToggleRowPreview" style="font-size:12px; padding:6px 12px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span id="textToggleRowPreview">Lihat Cuplikan Baris</span>
+                        </button>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" for="splitHeaderRowInput" style="font-size:12.5px;">
+                                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); margin-right:4px;"></span>
+                                Baris Header (Nama Kolom)
+                            </label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;">Baris ke-</span>
+                                <input type="number" id="splitHeaderRowInput" class="form-control" min="1" max="500" value="1"
+                                    style="max-width:85px; padding:7px 12px; font-weight:700; color:var(--accent);"
+                                    onchange="onSplitHeaderRowChange(this.value)" oninput="onSplitHeaderRowChange(this.value)">
+                            </div>
+                            <div class="form-hint" style="font-size:11px;">Nomor baris tempat judul kolom acuan berada.</div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label" for="splitDataStartRowInput" style="font-size:12.5px;">
+                                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--success); margin-right:4px;"></span>
+                                Data Dimulai Dari Baris
+                            </label>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;">Baris ke-</span>
+                                <input type="number" id="splitDataStartRowInput" class="form-control" min="2" max="500" value="2"
+                                    style="max-width:85px; padding:7px 12px; font-weight:700; color:var(--success);"
+                                    onchange="onSplitDataStartRowChange(this.value)" oninput="onSplitDataStartRowChange(this.value)">
+                            </div>
+                            <div class="form-hint" style="font-size:11px;">Baris awal rekaman data yang akan dipisah (contoh: baris 3).</div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Row Snippet Preview Table -->
+                    <div id="splitRowPreviewSection" style="display:none; margin-top:4px; border-top:1px dashed var(--border); padding-top:12px;">
+                        <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                            <span>Cuplikan 6 Baris Pertama File Sumber:</span>
+                            <span style="font-size:11px; color:var(--text-muted);">Gunakan tombol aksi cepat untuk memilih baris</span>
+                        </div>
+                        <div class="table-wrapper" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius-xs);">
+                            <table style="font-size:12px; width:100%;" id="splitRowSnippetTable">
+                                <!-- Populated dynamically via JS -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Multi-Column Split Rules Container -->
                 <div class="split-rules-container">
                     <div class="split-rules-header">
@@ -1976,6 +2043,8 @@
         let splitGroups = [];          // [ { key, keyParts, fileKey, filename, rows: [[...], ...], count } ]
         let splitReady = false;
         let selectedSplitPreviewKey = null;
+        let splitHeaderRow = 1;        // 1-indexed (nomor baris header)
+        let splitDataStartRow = 2;     // 1-indexed (nomor baris awal data)
 
         // ─── DOM References ──────────────────────────────────────────
         // Header
@@ -2614,8 +2683,11 @@
                     splitUploadedFiles.push(parsed);
 
                     if (splitUploadedFiles.length === 1) {
-                        splitRefColumns = parsed.data[0].map(c => String(c).trim());
+                        const hIdx = splitHeaderRow - 1;
+                        const rawHeaders = (parsed.data[hIdx] || parsed.data[0] || []).map(c => String(c === undefined || c === null ? '' : c).trim());
+                        splitRefColumns = rawHeaders.map((c, i) => c || `Kolom_${getColumnLetter(i)}`);
                         initSplitConfigs();
+                        renderSplitRowSnippetTable();
                     }
                     successCount++;
                 } catch (err) {
@@ -2649,11 +2721,14 @@
             document.getElementById('splitStep3').className = splitReady ? 'step active' : 'step';
 
             renderSplitFileList();
+            renderSplitRowSnippetTable();
             onSplitConfigChange();
         }
 
         function renderSplitFileList() {
-            splitFileList.innerHTML = splitUploadedFiles.map((f, i) => `
+            splitFileList.innerHTML = splitUploadedFiles.map((f, i) => {
+                const dataRowsCount = Math.max(0, f.data.length - (splitDataStartRow - 1));
+                return `
                 <div class="file-item">
                     <div class="file-item-icon" style="background:rgba(59, 130, 246, 0.1);">
                         <svg viewBox="0 0 24 24" style="stroke:#3b82f6;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -2663,7 +2738,7 @@
                         <div class="file-item-meta">
                             <span>${formatSize(f.size)}</span>
                             <span class="file-item-meta-dot"></span>
-                            <span>${f.rows} baris</span>
+                            <span>${dataRowsCount} baris data</span>
                             <span class="file-item-meta-dot"></span>
                             <span>${f.data[0].length} kolom</span>
                             ${i === 0 ? '<span class="file-item-badge" title="Struktur & kolom referensi">REFERENSI</span>' : ''}
@@ -2673,14 +2748,18 @@
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function removeSplitFile(index) {
             splitUploadedFiles.splice(index, 1);
             if (index === 0 && splitUploadedFiles.length > 0) {
-                splitRefColumns = splitUploadedFiles[0].data[0].map(c => String(c).trim());
+                const hIdx = splitHeaderRow - 1;
+                const rawHeaders = (splitUploadedFiles[0].data[hIdx] || splitUploadedFiles[0].data[0] || []).map(c => String(c === undefined || c === null ? '' : c).trim());
+                splitRefColumns = rawHeaders.map((c, i) => c || `Kolom_${getColumnLetter(i)}`);
                 validateAndFixSplitConfigs();
+                renderSplitRowSnippetTable();
             } else if (splitUploadedFiles.length === 0) {
                 splitRefColumns = [];
                 splitConfigs = [];
@@ -2700,6 +2779,12 @@
             splitGroups = [];
             splitReady = false;
             editingSplitKey = null;
+            splitHeaderRow = 1;
+            splitDataStartRow = 2;
+            const hInput = document.getElementById('splitHeaderRowInput');
+            const dInput = document.getElementById('splitDataStartRowInput');
+            if (hInput) hInput.value = 1;
+            if (dInput) dInput.value = 2;
             splitResultSection.style.display = 'none';
             splitGroupDetailSection.style.display = 'none';
             dropZoneSplit.classList.remove('disabled');
@@ -2925,6 +3010,135 @@
             return letter;
         }
 
+        function onSplitHeaderRowChange(val) {
+            if (splitUploadedFiles.length === 0) return;
+            const num = Math.max(1, parseInt(val, 10) || 1);
+            splitHeaderRow = num;
+            const hInput = document.getElementById('splitHeaderRowInput');
+            if (hInput) hInput.value = splitHeaderRow;
+
+            if (splitDataStartRow <= splitHeaderRow) {
+                splitDataStartRow = splitHeaderRow + 1;
+                const dInput = document.getElementById('splitDataStartRowInput');
+                if (dInput) dInput.value = splitDataStartRow;
+            }
+
+            const firstFileData = splitUploadedFiles[0].data;
+            const hIdx = splitHeaderRow - 1;
+            const rawHeaders = (firstFileData[hIdx] || []).map(c => String(c === undefined || c === null ? '' : c).trim());
+            splitRefColumns = rawHeaders.map((c, i) => c || `Kolom_${getColumnLetter(i)}`);
+
+            validateAndFixSplitConfigs();
+            renderSplitRowSnippetTable();
+            renderSplitFileList();
+            onSplitConfigChange();
+        }
+
+        function onSplitDataStartRowChange(val) {
+            if (splitUploadedFiles.length === 0) return;
+            const num = Math.max(splitHeaderRow + 1, parseInt(val, 10) || (splitHeaderRow + 1));
+            splitDataStartRow = num;
+            const dInput = document.getElementById('splitDataStartRowInput');
+            if (dInput) dInput.value = splitDataStartRow;
+
+            renderSplitRowSnippetTable();
+            renderSplitFileList();
+            onSplitConfigChange();
+        }
+
+        function setSplitHeaderRowDirect(rowNum) {
+            onSplitHeaderRowChange(rowNum);
+        }
+
+        function setSplitDataStartRowDirect(rowNum) {
+            onSplitDataStartRowChange(rowNum);
+        }
+
+        function toggleSplitRowPreview() {
+            const el = document.getElementById('splitRowPreviewSection');
+            const textEl = document.getElementById('textToggleRowPreview');
+            if (!el) return;
+            const isHidden = el.style.display === 'none';
+            el.style.display = isHidden ? 'block' : 'none';
+            if (textEl) {
+                textEl.textContent = isHidden ? 'Tutup Cuplikan' : 'Lihat Cuplikan Baris';
+            }
+            if (isHidden) {
+                renderSplitRowSnippetTable();
+            }
+        }
+
+        function renderSplitRowSnippetTable() {
+            const tableEl = document.getElementById('splitRowSnippetTable');
+            if (!tableEl || splitUploadedFiles.length === 0) return;
+
+            const firstFileData = splitUploadedFiles[0].data;
+            const maxRows = Math.min(8, firstFileData.length);
+
+            let html = `
+                <thead>
+                    <tr style="background:var(--bg-card); color:var(--text-muted); font-size:11px;">
+                        <th style="width:65px; padding:6px 10px;">Baris</th>
+                        <th style="width:90px; padding:6px 10px;">Status</th>
+                        <th style="padding:6px 10px;">Cuplikan Isi Kolom (Maks 5 Kolom Pertama)</th>
+                        <th style="width:170px; text-align:right; padding:6px 10px;">Aksi Cepat</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            for (let r = 0; r < maxRows; r++) {
+                const rowNum = r + 1;
+                const rowData = firstFileData[r] || [];
+                const previewCells = rowData.slice(0, 5).map(c => String(c === undefined || c === null ? '' : c).trim());
+                const cellsStr = previewCells.join(' | ') || '(baris kosong)';
+
+                const isHeader = rowNum === splitHeaderRow;
+                const isDataStart = rowNum === splitDataStartRow;
+                const isSkipped = rowNum < splitHeaderRow || (rowNum > splitHeaderRow && rowNum < splitDataStartRow);
+
+                let statusBadge = '';
+                if (isHeader) {
+                    statusBadge = '<span style="background:var(--accent); color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;">HEADER</span>';
+                } else if (isDataStart) {
+                    statusBadge = '<span style="background:var(--success); color:#0a0e1a; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;">AWAL DATA</span>';
+                } else if (isSkipped) {
+                    statusBadge = '<span style="color:var(--text-muted); font-size:10.5px;">Dilewati</span>';
+                } else {
+                    statusBadge = '<span style="color:var(--text-secondary); font-size:10.5px;">Data</span>';
+                }
+
+                const rowBg = isHeader ? 'rgba(79, 124, 255, 0.09)' : (isDataStart ? 'rgba(52, 211, 153, 0.09)' : 'transparent');
+
+                html += `
+                    <tr style="background:${rowBg}; border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <td style="padding:6px 10px; font-weight:700; font-family:'Consolas',monospace; color:var(--text-primary);">
+                            #${rowNum}
+                        </td>
+                        <td style="padding:6px 10px;">
+                            ${statusBadge}
+                        </td>
+                        <td style="padding:6px 10px; font-family:'Consolas',monospace; font-size:11.5px; color:var(--text-secondary); max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(cellsStr)}">
+                            ${escapeHtml(cellsStr)}
+                        </td>
+                        <td style="padding:6px 10px; text-align:right; white-space:nowrap;">
+                            <button type="button" class="rule-btn" onclick="setSplitHeaderRowDirect(${rowNum})"
+                                style="width:auto; padding:2px 7px; font-size:11px; margin-right:4px; ${isHeader ? 'border-color:var(--accent); color:var(--accent);' : ''}" title="Jadikan baris ${rowNum} sebagai Header Kolom">
+                                Header
+                            </button>
+                            <button type="button" class="rule-btn" onclick="setSplitDataStartRowDirect(${rowNum})"
+                                style="width:auto; padding:2px 7px; font-size:11px; ${isDataStart ? 'border-color:var(--success); color:var(--success);' : ''}" title="Mulai pembacaan data dari baris ${rowNum}">
+                                Awal Data
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            html += '</tbody>';
+            tableEl.innerHTML = html;
+        }
+
         let splitRefPosition = 'prefix'; // 'prefix' | 'suffix' | 'custom'
         let editingSplitKey = null;
 
@@ -3021,7 +3235,8 @@
             splitConfigs.forEach((cfg, idx) => {
                 const colIdx = cfg.colIndex;
                 let sampleVal = '';
-                for (let r = 1; r < firstFileData.length; r++) {
+                const startR = splitDataStartRow - 1;
+                for (let r = startR; r < firstFileData.length; r++) {
                     const v = firstFileData[r][colIdx];
                     if (v !== undefined && v !== null && String(v).trim() !== '') {
                         sampleVal = String(v).trim();
@@ -3078,7 +3293,7 @@
                 } else {
                     posExplanation = 'Posisi: Mengikuti <strong>Pola Format Kustom</strong>.';
                 }
-                splitPreviewExplanation.innerHTML = `Urutan pemisahan (${splitConfigs.length} kolom): <strong>${explanationParts.join(' &rarr; ')}</strong>.<br>${posExplanation} <span style="color:#34d399; font-weight:600;">Semua kolom output berformat teks murni (bebas notasi E).</span>`;
+                splitPreviewExplanation.innerHTML = `Urutan (${splitConfigs.length} kolom): <strong>${explanationParts.join(' &rarr; ')}</strong>.<br>${posExplanation} &bull; <span style="color:var(--text-muted);">Header: B#${splitHeaderRow}, Data: B#${splitDataStartRow}</span>. <span style="color:#34d399; font-weight:600;">Semua kolom output berformat teks murni.</span>`;
             }
         }
 
@@ -3150,18 +3365,21 @@
                     const headerRow = splitRefColumns.slice();
                     const groupsMap = new Map(); // compositeKey -> { displayKey, keyParts, fileKey, rows: [] }
 
+                    const headerIdx = splitHeaderRow - 1;
+                    const dataStartIdx = splitDataStartRow - 1;
+
                     splitUploadedFiles.forEach(file => {
-                        const fileHeader = file.data[0].map(c => String(c).trim());
+                        const fileHeaderRaw = (file.data[headerIdx] || file.data[0] || []).map(c => String(c === undefined || c === null ? '' : c).trim());
                         // Map each column of file 1 to file's columns
-                        const colMap = splitRefColumns.map(refCol => fileHeader.indexOf(refCol));
+                        const colMap = splitRefColumns.map(refCol => fileHeaderRaw.indexOf(refCol));
 
                         // Find index of each split rule's column in this file
                         const ruleColIndicesInFile = splitConfigs.map(cfg => {
                             const refColName = splitRefColumns[cfg.colIndex];
-                            return fileHeader.indexOf(refColName);
+                            return fileHeaderRaw.indexOf(refColName);
                         });
 
-                        for (let r = 1; r < file.data.length; r++) {
+                        for (let r = dataStartIdx; r < file.data.length; r++) {
                             const row = file.data[r];
                             if (row.every(cell => cell === '' || cell === null || cell === undefined)) continue;
 

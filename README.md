@@ -19,6 +19,9 @@ Aplikasi web modern berbasis client-side untuk mengolah data file Excel (.xlsx, 
 - Unduh hasil dalam format `.xlsx` atau `.csv`.
 
 ### 2. Split Excel (Fitur Canggih & Fleksibel 🚀)
+- **Pengaturan Baris Data & Header Fleksibel**:
+  - Pengguna dapat menentukan **baris ke berapa yang menjadi header kolom** dan **baris ke berapa data sebenarnya dimulai** (misal baris 1 & 2 berisi judul laporan/banner, dan data dimulai dari baris ke-3).
+  - Dilengkapi fitur **Cuplikan Baris (Row Snippet)** yang menampilkan isi baris-baris awal file sumber dengan tombol cepat untuk menetapkan header atau awal data dalam 1 klik.
 - **Split Multi-Kolom dengan Pengaturan Urutan (Order)**:
   - Dapat memisahkan file berdasarkan **1 atau lebih kolom acuan**.
   - Dilengkapi tombol geser urutan (▲ / ▼) untuk mengatur prioritas pemisahan (*hierarchical grouping*) dan susunan nama file output.
